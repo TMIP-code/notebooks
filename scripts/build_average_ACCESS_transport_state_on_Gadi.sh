@@ -1,10 +1,11 @@
 #!/bin/bash
 
+#PBS -P xv83
 #PBS -N ESM15transport
 #PBS -l ncpus=28
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB
-#PBS -l walltime=1:00:00
+#PBS -l walltime=12:00:00
 #PBS -l storage=gdata/xv83+gdata/dk92+gdata/fs38+gdata/hh5
 #PBS -l wd
 #PBS -o output/PBS/
@@ -22,13 +23,16 @@ conda info
 echo "Loading python3/3.12.1"
 module load python3/3.12.1
 
-# CHANGE HERE: comment/uncomment triplets of (experiment, first_year, last_year)
-# Note that historical and RCPs should end year 2006 and 2100, respectively
-# and that RCPs should start 2006 (zero-based indexing in python)
-ensemble=r1i1p1f1
+# CHANGE HERE the model, experiment, ensemble, etc.
+model=ACCESS-ESM1-5
+experiment=historical
+ensemble=r1i1p1f1 # <- note that this is not used in the script
+year_start=1990
+num_years=10
 
 echo "Running transport-state script"
-python scripts/build_average_ACCESS-ESM1.5_transport_state_on_Gadi.py $ensemble \
-&> output/$ensemble.$PBS_JOBID.out
+python scripts/build_average_ACCESS_transport_state_on_Gadi.py $model $experiment $ensemble $year_start $num_years \
+&> output/$model.$experiment.allensembles.$year_start.$num_years.$PBS_JOBID.out
+# &> output/$model.$experiment.$ensemble.$year_start.$num_years.$PBS_JOBID.out
 
 
