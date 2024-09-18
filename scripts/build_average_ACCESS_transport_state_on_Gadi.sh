@@ -33,6 +33,5 @@ num_years=10
 echo "Running transport-state script"
 python scripts/build_average_ACCESS_transport_state_on_Gadi.py $model $experiment $ensemble $year_start $num_years \
 &> output/$model.$experiment.allensembles.$year_start.$num_years.$PBS_JOBID.out
-# &> output/$model.$experiment.$ensemble.$year_start.$num_years.$PBS_JOBID.out
 
 

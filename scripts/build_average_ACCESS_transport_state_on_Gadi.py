@@ -117,11 +117,21 @@ searched_cat = cat.search(
     source_id = model,
     experiment_id = experiment,
     # member_id = ensemble,
-    variable_id = ["umo", "vmo", "mlotst"],
+    variable_id = ["umo", "vmo", "mlotst", "volcello", "areacello"],
     realm = 'ocean')
 
 members = searched_cat.df.member_id.unique()
-
+# sort members that are formatted as "r%di%dp%df%d" where %d is a integer
+import re
+def extract_numbers(member):
+    # Extract integers from the string using regex
+    return list(map(int, re.findall(r'\d+', member)))
+def sort_members(members):
+    # Sort members using the custom key function
+    return sorted(members, key=extract_numbers)
+sorted_members = sort_members(members)
+# print members on one line each
+print("\n".join(sorted_members))
 
 # Create directory on scratch to save the data
 datadir = '/scratch/xv83/TMIP/data'
@@ -139,9 +149,47 @@ print("Starting client")
 if __name__ == '__main__':
     client = Client(n_workers=4)#, threads_per_worker=1, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
 
-    for member in members:
+    for member in sorted_members:
 
         print(f"\nProcessing member: {member}")
+
+
+        # Load the fixed data
+        print("Loading fixed data")
+
+        # volcello dataset
+        print("Loading volcello data")
+        volcello_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'i': 60, 'j': 60, 'lev':50}
+            ),
+            variable_id = "volcello",
+            member_id = member,
+            table_id = "Ofx",
+        )
+
+        # areacello dataset
+        print("Loading areacello data")
+        areacello_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'i': 60, 'j': 60}
+            ),
+            variable_id = "areacello",
+            member_id = member,
+            table_id = "Ofx",
+        )
+
+        volcello = volcello_datadask["volcello"]
+        areacello = areacello_datadask["areacello"]
+
+        # Save the fixed data to NetCDF
+        print("Saving fixed data to NetCDF")
+        outputdir = f'{datadir}/{model}/{experiment}/{member}/{start_time_str}-{end_time_str}'
+        print("Creating directory: ", outputdir)
+        makedirs(outputdir, exist_ok=True)
+        volcello.to_netcdf(f'{outputdir}/volcello.nc', compute=True)
+        areacello.to_netcdf(f'{outputdir}/areacello.nc', compute=True)
+
 
         # umo dataset
         print("Loading umo data")
@@ -180,6 +228,7 @@ if __name__ == '__main__':
         # print("\nmlotst_datadask: ", mlotst_datadask)
 
 
+
         # Average the data
         print("Average the data over the time period")
 
@@ -204,11 +253,9 @@ if __name__ == '__main__':
         mlotst = mlotst_yearlymax.mean(dim="year")
         # print("\nmlotst: ", mlotst)
 
-        # Save the data to NetCDF
-        print("Saving data to NetCDF")
-        outputdir = f'{datadir}/{model}/{experiment}/{member}/{start_time_str}-{end_time_str}'
-        print("Creating directory: ", outputdir)
-        makedirs(outputdir, exist_ok=True)
+
+        # Save the averaged data to NetCDF
+        print("Saving averaged data to NetCDF")
         umo.to_netcdf(f'{outputdir}/umo.nc', compute=True)
         vmo.to_netcdf(f'{outputdir}/vmo.nc', compute=True)
         mlotst.to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
