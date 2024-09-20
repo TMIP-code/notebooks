@@ -117,7 +117,7 @@ searched_cat = cat.search(
     source_id = model,
     experiment_id = experiment,
     # member_id = ensemble,
-    variable_id = ["umo", "vmo", "mlotst", "volcello", "areacello"],
+    variable_id = ["umo", "vmo", "mlotst", "volcello", "areacello", "agessc"],
     realm = 'ocean')
 
 members = searched_cat.df.member_id.unique()
@@ -227,7 +227,17 @@ if __name__ == '__main__':
         )
         # print("\nmlotst_datadask: ", mlotst_datadask)
 
-
+        # vmo dataset
+        print("Loading agessc data")
+        agessc_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+            ),
+            variable_id = "agessc",
+            member_id = member,
+            frequency = "mon",
+        )
+        # print("\nagessc_datadask: ", agessc_datadask)
 
         # Average the data
         print("Average the data over the time period")
@@ -244,6 +254,12 @@ if __name__ == '__main__':
         vmo = vmo_datadask_sel["vmo"].weighted(vmo_datadask_sel.time.dt.days_in_month).mean(dim="time")
         # print("\nvmo: ", vmo)
 
+        # Slice agessc dataset for the time period
+        agessc_datadask_sel = agessc_datadask.sel(time=slice(start_time, end_time))
+        # Take the time average of the monthly evaporation (using month length as weights)
+        agessc = agessc_datadask_sel["agessc"].weighted(agessc_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        # print("\nagessc: ", agessc)
+
         # Slice mlotst dataset for the time period
         mlotst_datadask_sel = mlotst_datadask.sel(time=slice(start_time, end_time))
         # Take the time mean of the yearly maximum of mlotst
@@ -258,6 +274,7 @@ if __name__ == '__main__':
         print("Saving averaged data to NetCDF")
         umo.to_netcdf(f'{outputdir}/umo.nc', compute=True)
         vmo.to_netcdf(f'{outputdir}/vmo.nc', compute=True)
+        agessc.to_netcdf(f'{outputdir}/agessc.nc', compute=True)
         mlotst.to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
 
 
