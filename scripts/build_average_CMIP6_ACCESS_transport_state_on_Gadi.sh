@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #PBS -P xv83
-#PBS -N ESM15transport
+#PBS -N CMIP6_ACCESS_preprocessing
 #PBS -l ncpus=28
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB
@@ -24,14 +24,14 @@ echo "Loading python3/3.12.1"
 module load python3/3.12.1
 
 # CHANGE HERE the model, experiment, ensemble, etc.
-model=ACCESS-ESM1-5
+model=ACCESS-CM2
 experiment=historical
 ensemble=r1i1p1f1 # <- note that this is not used in the script
 year_start=1990
 num_years=10
 
 echo "Running transport-state script"
-python scripts/build_average_ACCESS_transport_state_on_Gadi.py $model $experiment $ensemble $year_start $num_years \
+python scripts/build_average_CMIP6_ACCESS_transport_state_on_Gadi.py $model $experiment $ensemble $year_start $num_years \
 &> output/$model.$experiment.allensembles.$year_start.$num_years.$PBS_JOBID.out
 
 
