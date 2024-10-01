@@ -3,8 +3,8 @@
 
 # required variables for building the transport matrix are:
 # - monthly variables:
-#   - umo
-#   - vmo
+#   - uo
+#   - vo
 #   - mlotst (average of the yearly maximum of the mixed layer)
 # - fixed variables (not need for any preprocessing, but listed here for completeness):
 #   - areacello
@@ -15,7 +15,7 @@
 #       - lon_vertices
 #       - lat_vertices
 #
-# The goal is to create NetCDF files of time-averaged ocean-transport states (`umo`, `vmo`, and `mlotst`) from ACCESS-ESM1.5 runs.
+# The goal is to create NetCDF files of time-averaged ocean-transport states (`uo`, `vo`, and `mlotst`) from ACCESS-ESM1.5 runs.
 #
 
 # import sys to access script arguments (experiment, ensemble, first_year, last_year)
@@ -117,7 +117,7 @@ searched_cat = cat.search(
     source_id = model,
     experiment_id = experiment,
     # member_id = ensemble,
-    variable_id = ["umo", "vmo", "mlotst", "volcello", "areacello", "agessc"],
+    variable_id = ["uo", "vo", "mlotst", "volcello", "areacello", "agessc"],
     realm = 'ocean')
 
 members = searched_cat.df.member_id.unique()
@@ -191,29 +191,29 @@ if __name__ == '__main__':
         areacello.to_netcdf(f'{outputdir}/areacello.nc', compute=True)
 
 
-        # umo dataset
-        print("Loading umo data")
+        # uo dataset
+        print("Loading uo data")
         umo_datadask = select_latest_data(searched_cat,
             dict(
                 chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
             ),
-            variable_id = "umo",
+            variable_id = "uo",
             member_id = member,
             frequency = "mon",
         )
-        # print("\numo_datadask: ", umo_datadask)
+        # print("\nuo_datadask: ", umo_datadask)
 
-        # vmo dataset
-        print("Loading vmo data")
+        # vo dataset
+        print("Loading vo data")
         vmo_datadask = select_latest_data(searched_cat,
             dict(
                 chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
             ),
-            variable_id = "vmo",
+            variable_id = "vo",
             member_id = member,
             frequency = "mon",
         )
-        # print("\nvmo_datadask: ", vmo_datadask)
+        # print("\nvo_datadask: ", vmo_datadask)
 
         # mlotst dataset
         print("Loading mlotst data")
@@ -227,7 +227,7 @@ if __name__ == '__main__':
         )
         # print("\nmlotst_datadask: ", mlotst_datadask)
 
-        # vmo dataset
+        # agessc dataset
         print("Loading agessc data")
         agessc_datadask = select_latest_data(searched_cat,
             dict(
@@ -242,17 +242,17 @@ if __name__ == '__main__':
         # Average the data
         print("Average the data over the time period")
 
-        # Slice umo dataset for the time period
+        # Slice uo dataset for the time period
         umo_datadask_sel = umo_datadask.sel(time=slice(start_time, end_time))
         # Take the time average of the monthly evaporation (using month length as weights)
-        umo = umo_datadask_sel["umo"].weighted(umo_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        # print("\numo: ", umo)
+        uo = umo_datadask_sel["uo"].weighted(umo_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        # print("\nuo: ", uo)
 
-        # Slice vmo dataset for the time period
+        # Slice vo dataset for the time period
         vmo_datadask_sel = vmo_datadask.sel(time=slice(start_time, end_time))
         # Take the time average of the monthly evaporation (using month length as weights)
-        vmo = vmo_datadask_sel["vmo"].weighted(vmo_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        # print("\nvmo: ", vmo)
+        vo = vmo_datadask_sel["vo"].weighted(vmo_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        # print("\nvo: ", vo)
 
         # Slice agessc dataset for the time period
         agessc_datadask_sel = agessc_datadask.sel(time=slice(start_time, end_time))
@@ -272,8 +272,8 @@ if __name__ == '__main__':
 
         # Save the averaged data to NetCDF
         print("Saving averaged data to NetCDF")
-        umo.to_netcdf(f'{outputdir}/umo.nc', compute=True)
-        vmo.to_netcdf(f'{outputdir}/vmo.nc', compute=True)
+        uo.to_netcdf(f'{outputdir}/uo.nc', compute=True)
+        vo.to_netcdf(f'{outputdir}/vo.nc', compute=True)
         agessc.to_netcdf(f'{outputdir}/agessc.nc', compute=True)
         mlotst.to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
 

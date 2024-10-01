@@ -226,7 +226,7 @@ if __name__ == '__main__':
         )
         # print("\nmlotst_datadask: ", mlotst_datadask)
 
-        # vmo dataset
+        # agessc dataset
         print("Loading agessc data")
         agessc_datadask = select_latest_data(searched_cat,
             dict(

@@ -24,7 +24,7 @@ echo "Loading python3/3.12.1"
 module load python3/3.12.1
 
 # CHANGE HERE the model, experiment, ensemble, etc.
-model=ACCESS-CM2
+model=ACCESS-ESM1-5
 experiment=piControl
 ensemble=r1i1p1f1 # <- note that this is not used in the script
 # year_start=1990
