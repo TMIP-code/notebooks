@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #PBS -P xv83
-#PBS -N CMIP6_ACCESS_preprocessing
+#PBS -N CMIP6_nonACCESS_preprocessing
 #PBS -l ncpus=28
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB

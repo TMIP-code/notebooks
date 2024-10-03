@@ -135,12 +135,15 @@ print(searched_cat)
 members = searched_cat.df.member_id.unique()
 # sort members that are formatted as "r%di%dp%df%d" where %d is a integer
 import re
+
 def extract_numbers(member):
     # Extract integers from the string using regex
     return list(map(int, re.findall(r'\d+', member)))
+
 def sort_members(members):
     # Sort members using the custom key function
     return sorted(members, key=extract_numbers)
+
 sorted_members = sort_members(members)
 # print members on one line each
 print("\n".join(sorted_members))
