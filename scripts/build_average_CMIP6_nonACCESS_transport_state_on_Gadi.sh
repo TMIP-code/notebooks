@@ -5,7 +5,7 @@
 #PBS -l ncpus=28
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB
-#PBS -l walltime=12:00:00
+#PBS -l walltime=1:00:00
 #PBS -l storage=gdata/xv83+gdata/dk92+gdata/oi10+gdata/hh5+gdata/xp65
 #PBS -l wd
 #PBS -o output/PBS/
@@ -24,9 +24,14 @@ echo "Loading python3/3.12.1"
 module load python3/3.12.1
 
 # CHANGE HERE the model, experiment, ensemble, etc.
-# This is the entire list of models that use MOM
-# AND that also have umo, vmo, and mlotst on Pangeo
-model=BCC-CSM2-MR
+# List of models that have
+# - umo, vmo, uo, and vo:
+#   CMCC-CM2-HR4, CMCC-CM2-SR5, CMCC-ESM2, FGOALS-f3-L,
+#   FGOALS-g3, MPI-ESM-1-2-HAM, MPI-ESM1-2-HR, MPI-ESM1-2-LR,
+#   NorCPM1, NorESM2-LM, NorESM2-MM,
+# - uo and vo only:
+#   CESM2, CESM2-FV2, CESM2-WACCM-FV2, TaiESM1-TIMCOM
+model=CMCC-CM2-HR4
 # model=BCC-ESM1
 experiment=historical
 ensemble=r1i1p1f1 # <- note that this is not used in the script

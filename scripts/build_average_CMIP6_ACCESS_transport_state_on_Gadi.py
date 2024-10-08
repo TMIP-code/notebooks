@@ -3,8 +3,8 @@
 
 # required variables for building the transport matrix are:
 # - monthly variables:
-#   - umo
-#   - vmo
+#   - umo (or uo)
+#   - vmo (or uo)
 #   - mlotst (average of the yearly maximum of the mixed layer)
 # - fixed variables (not need for any preprocessing, but listed here for completeness):
 #   - areacello
@@ -108,8 +108,8 @@ def select_latest_data(cat, xarray_open_kwargs, **kwargs):
 
 # 3. Load catalog
 
-cat_str = "/g/data/dk92/catalog/v2/esm/cmip6-fs38/catalog.json" # <- this is the catalog for ACCESS CMIP6 output at NCI
-cat = intake.open_esm_datastore(cat_str)
+catalogs = intake.cat.access_nri
+cat = catalogs["cmip6_fs38"]
 print(cat)
 
 # Only keep the required data
@@ -119,6 +119,7 @@ searched_cat = cat.search(
     # member_id = ensemble,
     variable_id = ["uo", "vo", "umo", "vmo", "mlotst", "volcello", "areacello", "agessc"],
     realm = 'ocean')
+print(searched_cat)
 
 members = searched_cat.df.member_id.unique()
 
