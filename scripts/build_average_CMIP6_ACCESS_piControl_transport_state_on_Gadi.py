@@ -256,8 +256,8 @@ if __name__ == '__main__':
 
 
         # Save the fixed data to NetCDF
-        volcello.to_netcdf(f'{outputdir}/volcello.nc', compute=True)
-        areacello.to_netcdf(f'{outputdir}/areacello.nc', compute=True)
+        volcello_datadask.to_netcdf(f'{outputdir}/volcello.nc', compute=True)
+        areacello_datadask.to_netcdf(f'{outputdir}/areacello.nc', compute=True)
 
 
         # Slice umo dataset for the time period

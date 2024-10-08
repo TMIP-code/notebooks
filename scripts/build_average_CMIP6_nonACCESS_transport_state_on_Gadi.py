@@ -202,8 +202,8 @@ if __name__ == '__main__':
         outputdir = f'{datadir}/{model}/{experiment}/{member}/{start_time_str}-{end_time_str}'
         print("Creating directory: ", outputdir)
         makedirs(outputdir, exist_ok=True)
-        volcello.to_netcdf(f'{outputdir}/volcello.nc', compute=True)
-        areacello.to_netcdf(f'{outputdir}/areacello.nc', compute=True)
+        volcello_datadask.to_netcdf(f'{outputdir}/volcello.nc', compute=True)
+        areacello_datadask.to_netcdf(f'{outputdir}/areacello.nc', compute=True)
 
 
         # uo dataset

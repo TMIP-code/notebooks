@@ -118,7 +118,7 @@ searched_cat = cat.search(
     model = model,
     experiment = experiment,
     # ensemble = ensemble,
-    variable = ["umo", "vmo", "mlotst", "volcello", "areacello", "agessc"],
+    variable = ["uo", "vo", "umo", "vmo", "mlotst", "volcello", "areacello", "agessc"],
     realm = 'ocean')
 
 ensembles = searched_cat.df.ensemble.unique()
@@ -198,9 +198,14 @@ if __name__ == '__main__':
         outputdir = f'{datadir}/{model}/{experiment}/{ensemble}/{start_time_str}-{end_time_str}'
         print("Creating directory: ", outputdir)
         makedirs(outputdir, exist_ok=True)
-        volcello.to_netcdf(f'{outputdir}/volcello.nc', compute=True)
-        areacello.to_netcdf(f'{outputdir}/areacello.nc', compute=True)
 
+        volcello_file = f'{outputdir}/volcello.nc'
+        print("Saving volcello to: ", volcello_file)
+        volcello_datadask.to_netcdf(volcello_file, compute=True)
+
+        areacello_file = f'{outputdir}/areacello.nc'
+        print("Saving areacello to: ", areacello_file)
+        areacello_datadask.to_netcdf(areacello_file, compute=True)
 
         # umo dataset
         print("Loading umo data")
@@ -225,6 +230,30 @@ if __name__ == '__main__':
             frequency = "mon",
         )
         # print("\nvmo_datadask: ", vmo_datadask)
+
+        # uo dataset
+        print("Loading uo data")
+        uo_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+            ),
+            variable = "uo",
+            ensemble = ensemble,
+            frequency = "mon",
+        )
+        # print("\nuo_datadask: ", uo_datadask)
+
+        # vo dataset
+        print("Loading vo data")
+        vo_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+            ),
+            variable = "vo",
+            ensemble = ensemble,
+            frequency = "mon",
+        )
+        # print("\nvo_datadask: ", vo_datadask)
 
         # mlotst dataset
         print("Loading mlotst data")
@@ -265,6 +294,18 @@ if __name__ == '__main__':
         vmo = vmo_datadask_sel["vmo"].weighted(vmo_datadask_sel.time.dt.days_in_month).mean(dim="time")
         # print("\nvmo: ", vmo)
 
+        # Slice uo dataset for the time period
+        uo_datadask_sel = uo_datadask.sel(time=slice(start_time, end_time))
+        # Take the time average of the monthly evaporation (using month length as weights)
+        uo = uo_datadask_sel["uo"].weighted(uo_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        # print("\nuo: ", uo)
+
+        # Slice vo dataset for the time period
+        vo_datadask_sel = vo_datadask.sel(time=slice(start_time, end_time))
+        # Take the time average of the monthly evaporation (using month length as weights)
+        vo = vo_datadask_sel["vo"].weighted(vo_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        # print("\nvo: ", vo)
+
         # Slice agessc dataset for the time period
         agessc_datadask_sel = agessc_datadask.sel(time=slice(start_time, end_time))
         # Take the time average of the monthly evaporation (using month length as weights)
@@ -285,6 +326,8 @@ if __name__ == '__main__':
         print("Saving averaged data to NetCDF")
         umo.to_netcdf(f'{outputdir}/umo.nc', compute=True)
         vmo.to_netcdf(f'{outputdir}/vmo.nc', compute=True)
+        uo.to_netcdf(f'{outputdir}/uo.nc', compute=True)
+        vo.to_netcdf(f'{outputdir}/vo.nc', compute=True)
         agessc.to_netcdf(f'{outputdir}/agessc.nc', compute=True)
         mlotst.to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
 
