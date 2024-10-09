@@ -106,6 +106,10 @@ def select_latest_cat(cat, **kwargs):
     search latest version of selected data
     """
     selectedcat = cat.search(**kwargs)
+    # if dataframe is empty, error
+    if selectedcat.df.empty:
+        raise ValueError(f"No data found for {kwargs}")
+
     latestselectedcat = selectedcat.search(version=find_latest_version(selectedcat))
     return latestselectedcat
 
@@ -139,8 +143,8 @@ searched_cat = cat.search(
     experiment_id = experiment,
     # member_id = ensemble,
     # file_type = "l",
+    grid_label = "gn",
     variable_id = ["uo", "vo", "umo", "vmo", "mlotst", "volcello", "areacello", "agessc"],
-    # variable_id = ["umo"],
     realm = 'ocean')
 print(searched_cat)
 
