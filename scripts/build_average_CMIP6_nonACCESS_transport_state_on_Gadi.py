@@ -111,6 +111,7 @@ def select_latest_cat(cat, **kwargs):
 
 def select_latest_data(cat, xarray_open_kwargs, **kwargs):
     latestselectedcat = select_latest_cat(cat, **kwargs)
+    print("\nlatestselectedcat: ", latestselectedcat)
     xarray_combine_by_coords_kwargs=dict(
         compat="override",
         data_vars="minimal",
@@ -181,49 +182,50 @@ if __name__ == '__main__':
 
         print(f"\nProcessing member: {member}")
 
-        # Load the fixed data
-        print("Loading fixed data")
-
-        # volcello dataset
-        print("Loading volcello data")
-        volcello_datadask = select_latest_data(searched_cat,
-            dict(
-                # chunks={'i': 60, 'j': 60, 'lev':50}
-            ),
-            variable_id = "volcello",
-            member_id = member,
-            table_id = "Ofx",
-        )
-        print("\nvolcello_datadask: ", volcello_datadask)
-
-        # areacello dataset
-        print("Loading areacello data")
-        areacello_datadask = select_latest_data(searched_cat,
-            dict(
-                # chunks={'i': 60, 'j': 60}
-            ),
-            variable_id = "areacello",
-            member_id = member,
-            table_id = "Ofx",
-        )
-        print("\nareacello_datadask: ", areacello_datadask)
-
-        volcello = volcello_datadask["volcello"]
-        areacello = areacello_datadask["areacello"]
-
-        # Save the fixed data to NetCDF
-        print("Saving fixed data to NetCDF")
+        # directory to save the data to (as NetCDF)
         outputdir = f'{datadir}/{model}/{experiment}/{member}/{start_time_str}-{end_time_str}'
         print("Creating directory: ", outputdir)
         makedirs(outputdir, exist_ok=True)
 
-        volcello_file = f'{outputdir}/volcello.nc'
-        print("Saving volcello to: ", volcello_file)
-        volcello_datadask.to_netcdf(volcello_file, compute=True)
+        # volcello
+        try:
+            print("Loading volcello data")
+            volcello_datadask = select_latest_data(searched_cat,
+                dict(
+                    # chunks={'i': 60, 'j': 60, 'lev':50}
+                ),
+                variable_id = "volcello",
+                member_id = member,
+                table_id = "Ofx",
+            )
+            print("\nvolcello_datadask: ", volcello_datadask)
+            volcello_file = f'{outputdir}/volcello.nc'
+            print("Saving volcello to: ", volcello_file)
+            volcello_datadask.to_netcdf(volcello_file, compute=True)
+        except Exception:
+            print(f'Error processing {model} {member} volcello')
+            print(traceback.format_exc())
 
-        areacello_file = f'{outputdir}/areacello.nc'
-        print("Saving areacello to: ", areacello_file)
-        areacello_datadask.to_netcdf(areacello_file, compute=True)
+
+        # areacello
+        try:
+            print("Loading areacello data")
+            areacello_datadask = select_latest_data(searched_cat,
+                dict(
+                    # chunks={'i': 60, 'j': 60}
+                ),
+                variable_id = "areacello",
+                member_id = member,
+                table_id = "Ofx",
+            )
+            print("\nareacello_datadask: ", areacello_datadask)
+            areacello_file = f'{outputdir}/areacello.nc'
+            print("Saving areacello to: ", areacello_file)
+            areacello_datadask.to_netcdf(areacello_file, compute=True)
+        except Exception:
+            print(f'Error processing {model} {member} areacello')
+            print(traceback.format_exc())
+
 
         # umo
         try:
@@ -245,7 +247,7 @@ if __name__ == '__main__':
             print("Saving umo to: ", f'{outputdir}/umo.nc')
             umo.to_netcdf(f'{outputdir}/umo.nc', compute=True)
         except Exception:
-            print("Error processing umo")
+            print(f'Error processing {model} {member} umo')
             print(traceback.format_exc())
 
         # vmo
@@ -268,7 +270,7 @@ if __name__ == '__main__':
             print("Saving vmo to: ", f'{outputdir}/vmo.nc')
             vmo.to_netcdf(f'{outputdir}/vmo.nc', compute=True)
         except Exception:
-            print("Error processing vmo")
+            print(f'Error processing {model} {member} vmo')
             print(traceback.format_exc())
 
         # uo
@@ -291,7 +293,7 @@ if __name__ == '__main__':
             print("Saving uo to: ", f'{outputdir}/uo.nc')
             uo.to_netcdf(f'{outputdir}/uo.nc', compute=True)
         except Exception:
-            print("Error processing uo")
+            print(f'Error processing {model} {member} uo')
             print(traceback.format_exc())
 
         # vo
@@ -314,30 +316,33 @@ if __name__ == '__main__':
             print("Saving vo to: ", f'{outputdir}/vo.nc')
             vo.to_netcdf(f'{outputdir}/vo.nc', compute=True)
         except Exception:
-            print("Error processing vo")
+            print(f'Error processing {model} {member} vo')
             print(traceback.format_exc())
 
         # mlotst dataset
-        print("Loading mlotst data")
-        mlotst_datadask = select_latest_data(searched_cat,
-            dict(
-                # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
-            ),
-            variable_id = "mlotst",
-            member_id = member,
-            frequency = "mon",
-        )
-        print("\nmlotst_datadask: ", mlotst_datadask)
-        print("Slicing mlotst for the time period")
-        mlotst_datadask_sel = mlotst_datadask.sel(time=slice(start_time, end_time))
-        print("Averaging mlotst (mean of the yearly maximum of monthly data)")
-        mlotst_yearlymax = mlotst_datadask_sel.groupby("time.year").max(dim="time")
-        print("\nmlotst_yearlymax: ", mlotst_yearlymax)
-        mlotst = mlotst_yearlymax.mean(dim="year")
-        print("\nmlotst: ", mlotst)
-        print("Saving mlotst to: ", f'{outputdir}/mlotst.nc')
-        mlotst.to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
-
+        try:
+            print("Loading mlotst data")
+            mlotst_datadask = select_latest_data(searched_cat,
+                dict(
+                    # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                ),
+                variable_id = "mlotst",
+                member_id = member,
+                frequency = "mon",
+            )
+            print("\nmlotst_datadask: ", mlotst_datadask)
+            print("Slicing mlotst for the time period")
+            mlotst_datadask_sel = mlotst_datadask.sel(time=slice(start_time, end_time))
+            print("Averaging mlotst (mean of the yearly maximum of monthly data)")
+            mlotst_yearlymax = mlotst_datadask_sel.groupby("time.year").max(dim="time")
+            print("\nmlotst_yearlymax: ", mlotst_yearlymax)
+            mlotst = mlotst_yearlymax.mean(dim="year")
+            print("\nmlotst: ", mlotst)
+            print("Saving mlotst to: ", f'{outputdir}/mlotst.nc')
+            mlotst.to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
+        except Exception:
+            print(f'Error processing {model} {member} mlotst')
+            print(traceback.format_exc())
 
 
         # agessc dataset
@@ -360,7 +365,7 @@ if __name__ == '__main__':
             print("Saving agessc to: ", f'{outputdir}/agessc.nc')
             agessc.to_netcdf(f'{outputdir}/agessc.nc', compute=True)
         except Exception:
-            print("Error processing agessc")
+            print(f'Error processing {model} {member} agessc')
             print(traceback.format_exc())
 
 
