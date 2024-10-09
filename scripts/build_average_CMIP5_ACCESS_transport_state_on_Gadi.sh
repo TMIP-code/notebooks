@@ -2,7 +2,7 @@
 
 #PBS -P xv83
 #PBS -N CMIP5_ACCESS_preprocessing
-#PBS -l ncpus=28
+#PBS -l ncpus=5
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB
 #PBS -l walltime=3:00:00
@@ -25,7 +25,7 @@ echo "Loading python3/3.12.1"
 module load python3/3.12.1
 
 # CHANGE HERE the model, experiment, ensemble, etc.
-model=ACCESS1-3
+model=ACCESS1-0
 experiment=historical
 ensemble=r1i1p1 # <- note that this is not used in the script
 year_start=1990

@@ -74,6 +74,8 @@ import datetime
 # Load xmip for preprocessing (trying to get consistent metadata for making matrices down the road)
 from xmip.preprocessing import combined_preprocessing
 
+# Load traceback to print exceptions
+import traceback
 
 # 2. Define some functions
 # (to avoid too much boilerplate code)
@@ -135,7 +137,9 @@ searched_cat = cat.search(
     source_id = model,
     experiment_id = experiment,
     # member_id = ensemble,
+    # file_type = "l",
     variable_id = ["uo", "vo", "umo", "vmo", "mlotst", "volcello", "areacello", "agessc"],
+    # variable_id = ["umo"],
     realm = 'ocean')
 print(searched_cat)
 
@@ -190,6 +194,7 @@ if __name__ == '__main__':
             member_id = member,
             table_id = "Ofx",
         )
+        print("\nvolcello_datadask: ", volcello_datadask)
 
         # areacello dataset
         print("Loading areacello data")
@@ -201,6 +206,7 @@ if __name__ == '__main__':
             member_id = member,
             table_id = "Ofx",
         )
+        print("\nareacello_datadask: ", areacello_datadask)
 
         volcello = volcello_datadask["volcello"]
         areacello = areacello_datadask["areacello"]
@@ -219,53 +225,101 @@ if __name__ == '__main__':
         print("Saving areacello to: ", areacello_file)
         areacello_datadask.to_netcdf(areacello_file, compute=True)
 
-        # umo dataset
-        print("Loading umo data")
-        umo_datadask = select_latest_data(searched_cat,
-            dict(
-                chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
-            ),
-            variable_id = "umo",
-            member_id = member,
-            frequency = "mon",
-        )
-        # print("\numo_datadask: ", umo_datadask)
+        # umo
+        try:
+            print("Loading umo data")
+            umo_datadask = select_latest_data(searched_cat,
+                dict(
+                    chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                ),
+                variable_id = "umo",
+                member_id = member,
+                frequency = "mon",
+            )
+            print("\numo_datadask: ", umo_datadask)
+            print("Slicing umo for the time period")
+            start_time, end_time = time_window_strings(year_start, num_years, time_type = type(umo_datadask.time.values[0]))
+            umo_datadask_sel = umo_datadask.sel(time=slice(start_time, end_time))
+            print("Averaging umo")
+            umo = umo_datadask_sel["umo"].weighted(umo_datadask_sel.time.dt.days_in_month).mean(dim="time")
+            print("\numo: ", umo)
+            print("Saving umo to: ", f'{outputdir}/umo.nc')
+            umo.to_netcdf(f'{outputdir}/umo.nc', compute=True)
+        except Exception:
+            print("Error processing umo")
+            print(traceback.format_exc())
 
-        # vmo dataset
-        print("Loading vmo data")
-        vmo_datadask = select_latest_data(searched_cat,
-            dict(
-                chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
-            ),
-            variable_id = "vmo",
-            member_id = member,
-            frequency = "mon",
-        )
-        # print("\nvmo_datadask: ", vmo_datadask)
+        # vmo
+        try:
+            print("Loading vmo data")
+            vmo_datadask = select_latest_data(searched_cat,
+                dict(
+                    chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                ),
+                variable_id = "vmo",
+                member_id = member,
+                frequency = "mon",
+            )
+            print("\nvmo_datadask: ", vmo_datadask)
+            print("Slicing vmo for the time period")
+            start_time, end_time = time_window_strings(year_start, num_years, time_type = type(vmo_datadask.time.values[0]))
+            vmo_datadask_sel = vmo_datadask.sel(time=slice(start_time, end_time))
+            print("Averaging vmo")
+            vmo = vmo_datadask_sel["vmo"].weighted(vmo_datadask_sel.time.dt.days_in_month).mean(dim="time")
+            print("\nvmo: ", vmo)
+            print("Saving vmo to: ", f'{outputdir}/vmo.nc')
+            vmo.to_netcdf(f'{outputdir}/vmo.nc', compute=True)
+        except Exception:
+            print("Error processing vmo")
+            print(traceback.format_exc())
 
-        # uo dataset
-        print("Loading uo data")
-        uo_datadask = select_latest_data(searched_cat,
-            dict(
-                chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
-            ),
-            variable_id = "uo",
-            member_id = member,
-            frequency = "mon",
-        )
-        # print("\nuo_datadask: ", uo_datadask)
+        # uo
+        try:
+            print("Loading uo data")
+            uo_datadask = select_latest_data(searched_cat,
+                dict(
+                    chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                ),
+                variable_id = "uo",
+                member_id = member,
+                frequency = "mon",
+            )
+            print("\nuo_datadask: ", uo_datadask)
+            print("Slicing uo for the time period")
+            start_time, end_time = time_window_strings(year_start, num_years, time_type = type(uo_datadask.time.values[0]))
+            uo_datadask_sel = uo_datadask.sel(time=slice(start_time, end_time))
+            print("Averaging uo")
+            uo = uo_datadask_sel["uo"].weighted(uo_datadask_sel.time.dt.days_in_month).mean(dim="time")
+            print("\nuo: ", uo)
+            print("Saving uo to: ", f'{outputdir}/uo.nc')
+            uo.to_netcdf(f'{outputdir}/uo.nc', compute=True)
+        except Exception:
+            print("Error processing uo")
+            print(traceback.format_exc())
 
-        # vo dataset
-        print("Loading vo data")
-        vo_datadask = select_latest_data(searched_cat,
-            dict(
-                chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
-            ),
-            variable_id = "vo",
-            member_id = member,
-            frequency = "mon",
-        )
-        # print("\nvo_datadask: ", vo_datadask)
+        # vo
+        try:
+            print("Loading vo data")
+            vo_datadask = select_latest_data(searched_cat,
+                dict(
+                    chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                ),
+                variable_id = "vo",
+                member_id = member,
+                frequency = "mon",
+            )
+            print("\nvo_datadask: ", vo_datadask)
+            print("Slicing vo for the time period")
+            start_time, end_time = time_window_strings(year_start, num_years, time_type = type(vo_datadask.time.values[0]))
+            vo_datadask_sel = vo_datadask.sel(time=slice(start_time, end_time))
+            print("Averaging vo")
+            vo = vo_datadask_sel["vo"].weighted(vo_datadask_sel.time.dt.days_in_month).mean(dim="time")
+            print("\nvo: ", vo)
+            print("Saving vo to: ", f'{outputdir}/vo.nc')
+            vo.to_netcdf(f'{outputdir}/vo.nc', compute=True)
+        except Exception:
+            print("Error processing vo")
+            print(traceback.format_exc())
 
         # mlotst dataset
         print("Loading mlotst data")
@@ -277,71 +331,44 @@ if __name__ == '__main__':
             member_id = member,
             frequency = "mon",
         )
-        # print("\nmlotst_datadask: ", mlotst_datadask)
+        print("\nmlotst_datadask: ", mlotst_datadask)
+        print("Slicing mlotst for the time period")
+        start_time, end_time = time_window_strings(year_start, num_years, time_type = type(mlotst_datadask.time.values[0]))
+        mlotst_datadask_sel = mlotst_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging mlotst (mean of the yearly maximum of monthly data)")
+        mlotst_yearlymax = mlotst_datadask_sel.groupby("time.year").max(dim="time")
+        print("\nmlotst_yearlymax: ", mlotst_yearlymax)
+        mlotst = mlotst_yearlymax.mean(dim="year")
+        print("\nmlotst: ", mlotst)
+        print("Saving mlotst to: ", f'{outputdir}/mlotst.nc')
+        mlotst.to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
+
+
 
         # agessc dataset
-        print("Loading agessc data")
-        agessc_datadask = select_latest_data(searched_cat,
-            dict(
-                chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
-            ),
-            variable_id = "agessc",
-            member_id = member,
-            frequency = "mon",
-        )
-        # print("\nagessc_datadask: ", agessc_datadask)
+        try:
+            print("Loading agessc data")
+            agessc_datadask = select_latest_data(searched_cat,
+                dict(
+                    chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                ),
+                variable_id = "agessc",
+                member_id = member,
+                frequency = "mon",
+            )
+            print("\nagessc_datadask: ", agessc_datadask)
+            print("Slicing agessc for the time period")
+            start_time, end_time = time_window_strings(year_start, num_years, time_type = type(agessc_datadask.time.values[0]))
+            agessc_datadask_sel = agessc_datadask.sel(time=slice(start_time, end_time))
+            print("Averaging agessc")
+            agessc = agessc_datadask_sel["agessc"].weighted(agessc_datadask_sel.time.dt.days_in_month).mean(dim="time")
+            print("\nagessc: ", agessc)
+            print("Saving agessc to: ", f'{outputdir}/agessc.nc')
+            agessc.to_netcdf(f'{outputdir}/agessc.nc', compute=True)
+        except Exception:
+            print("Error processing agessc")
+            print(traceback.format_exc())
 
-        # Average the data
-        print("Average the data over the time period")
-
-        # Slice umo dataset for the time period
-        umo_datadask_sel = umo_datadask.sel(time=slice(start_time, end_time))
-        # Take the time average of the monthly evaporation (using month length as weights)
-        umo = umo_datadask_sel["umo"].weighted(umo_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        # print("\numo: ", umo)
-
-        # Slice vmo dataset for the time period
-        vmo_datadask_sel = vmo_datadask.sel(time=slice(start_time, end_time))
-        # Take the time average of the monthly evaporation (using month length as weights)
-        vmo = vmo_datadask_sel["vmo"].weighted(vmo_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        # print("\nvmo: ", vmo)
-
-        # Slice uo dataset for the time period
-        uo_datadask_sel = uo_datadask.sel(time=slice(start_time, end_time))
-        # Take the time average of the monthly evaporation (using month length as weights)
-        uo = uo_datadask_sel["uo"].weighted(uo_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        # print("\nuo: ", uo)
-
-        # Slice vo dataset for the time period
-        vo_datadask_sel = vo_datadask.sel(time=slice(start_time, end_time))
-        # Take the time average of the monthly evaporation (using month length as weights)
-        vo = vo_datadask_sel["vo"].weighted(vo_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        # print("\nvo: ", vo)
-
-        # Slice agessc dataset for the time period
-        agessc_datadask_sel = agessc_datadask.sel(time=slice(start_time, end_time))
-        # Take the time average of the monthly evaporation (using month length as weights)
-        agessc = agessc_datadask_sel["agessc"].weighted(agessc_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        # print("\nagessc: ", agessc)
-
-        # Slice mlotst dataset for the time period
-        mlotst_datadask_sel = mlotst_datadask.sel(time=slice(start_time, end_time))
-        # Take the time mean of the yearly maximum of mlotst
-        mlotst_yearlymax = mlotst_datadask_sel.groupby("time.year").max(dim="time")
-        # print("\nmlotst_yearlymax: ", mlotst_yearlymax)
-
-        mlotst = mlotst_yearlymax.mean(dim="year")
-        # print("\nmlotst: ", mlotst)
-
-
-        # Save the averaged data to NetCDF
-        print("Saving averaged data to NetCDF")
-        umo.to_netcdf(f'{outputdir}/umo.nc', compute=True)
-        vmo.to_netcdf(f'{outputdir}/vmo.nc', compute=True)
-        uo.to_netcdf(f'{outputdir}/uo.nc', compute=True)
-        vo.to_netcdf(f'{outputdir}/vo.nc', compute=True)
-        agessc.to_netcdf(f'{outputdir}/agessc.nc', compute=True)
-        mlotst.to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
 
 
     client.close()
