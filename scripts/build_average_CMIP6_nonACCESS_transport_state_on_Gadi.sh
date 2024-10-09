@@ -40,8 +40,10 @@ year_start=1990
 num_years=10
 
 for model in CMCC-CM2-HR4 CMCC-CM2-SR5 CMCC-ESM2 FGOALS-f3-L FGOALS-g3 MPI-ESM-1-2-HAM MPI-ESM1-2-HR MPI-ESM1-2-LR NorCPM1 NorESM2-LM NorESM2-MM CESM2 CESM2-FV2 CESM2-WACCM-FV2 TaiESM1-TIMCOM; do
-    echo "Running transport-state script for $model model"
+    echo "Running transport-sg76v67mv65v>˘:"L>
+    ÷÷÷÷÷/,k(?≥÷≥;.tate script for $model model"
     python scripts/build_average_CMIP6_nonACCESS_transport_state_on_Gadi.py $model $experiment $ensemble $year_start $num_years \
     &> output/$model.$experiment.allensembles.$year_start.$num_years.$PBS_JOBID.out
 done
 
+/,k(?

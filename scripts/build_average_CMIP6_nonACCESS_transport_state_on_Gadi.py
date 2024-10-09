@@ -81,14 +81,14 @@ import traceback
 # (to avoid too much boilerplate code)
 print("Defining functions")
 
-def time_window_strings(year_start, num_years, time_type = datetime.datetime):
+def time_window_strings(year_start, num_years):
     """
     return strings for start_time and end_time
     """
     # start_time is first second of year_start
-    start_time = time_type(year_start, 1, 1, 0, 0, 0)
+    start_time = f'{year_start}'
     # end_time is last second of last_year
-    end_time = time_type(year_start + num_years - 1, 12, 31, 23, 59, 59)
+    end_time = f'{year_start + num_years - 1}'
     # Return the weighted average
     return start_time, end_time
 
@@ -164,8 +164,8 @@ print("\n".join(sorted_members))
 # Create directory on scratch to save the data
 datadir = '/scratch/xv83/TMIP/data'
 start_time, end_time = time_window_strings(year_start, num_years)
-start_time_str = start_time.strftime("%b%Y")
-end_time_str = end_time.strftime("%b%Y")
+start_time_str = f'Jan{start_time}'
+end_time_str = f'Dec{end_time}'
 
 
 
@@ -188,7 +188,7 @@ if __name__ == '__main__':
         print("Loading volcello data")
         volcello_datadask = select_latest_data(searched_cat,
             dict(
-                chunks={'i': 60, 'j': 60, 'lev':50}
+                # chunks={'i': 60, 'j': 60, 'lev':50}
             ),
             variable_id = "volcello",
             member_id = member,
@@ -200,7 +200,7 @@ if __name__ == '__main__':
         print("Loading areacello data")
         areacello_datadask = select_latest_data(searched_cat,
             dict(
-                chunks={'i': 60, 'j': 60}
+                # chunks={'i': 60, 'j': 60}
             ),
             variable_id = "areacello",
             member_id = member,
@@ -230,7 +230,7 @@ if __name__ == '__main__':
             print("Loading umo data")
             umo_datadask = select_latest_data(searched_cat,
                 dict(
-                    chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                    # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
                 ),
                 variable_id = "umo",
                 member_id = member,
@@ -238,7 +238,6 @@ if __name__ == '__main__':
             )
             print("\numo_datadask: ", umo_datadask)
             print("Slicing umo for the time period")
-            start_time, end_time = time_window_strings(year_start, num_years, time_type = type(umo_datadask.time.values[0]))
             umo_datadask_sel = umo_datadask.sel(time=slice(start_time, end_time))
             print("Averaging umo")
             umo = umo_datadask_sel["umo"].weighted(umo_datadask_sel.time.dt.days_in_month).mean(dim="time")
@@ -254,7 +253,7 @@ if __name__ == '__main__':
             print("Loading vmo data")
             vmo_datadask = select_latest_data(searched_cat,
                 dict(
-                    chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                    # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
                 ),
                 variable_id = "vmo",
                 member_id = member,
@@ -262,7 +261,6 @@ if __name__ == '__main__':
             )
             print("\nvmo_datadask: ", vmo_datadask)
             print("Slicing vmo for the time period")
-            start_time, end_time = time_window_strings(year_start, num_years, time_type = type(vmo_datadask.time.values[0]))
             vmo_datadask_sel = vmo_datadask.sel(time=slice(start_time, end_time))
             print("Averaging vmo")
             vmo = vmo_datadask_sel["vmo"].weighted(vmo_datadask_sel.time.dt.days_in_month).mean(dim="time")
@@ -278,7 +276,7 @@ if __name__ == '__main__':
             print("Loading uo data")
             uo_datadask = select_latest_data(searched_cat,
                 dict(
-                    chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                    # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
                 ),
                 variable_id = "uo",
                 member_id = member,
@@ -286,7 +284,6 @@ if __name__ == '__main__':
             )
             print("\nuo_datadask: ", uo_datadask)
             print("Slicing uo for the time period")
-            start_time, end_time = time_window_strings(year_start, num_years, time_type = type(uo_datadask.time.values[0]))
             uo_datadask_sel = uo_datadask.sel(time=slice(start_time, end_time))
             print("Averaging uo")
             uo = uo_datadask_sel["uo"].weighted(uo_datadask_sel.time.dt.days_in_month).mean(dim="time")
@@ -302,7 +299,7 @@ if __name__ == '__main__':
             print("Loading vo data")
             vo_datadask = select_latest_data(searched_cat,
                 dict(
-                    chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                    # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
                 ),
                 variable_id = "vo",
                 member_id = member,
@@ -310,7 +307,6 @@ if __name__ == '__main__':
             )
             print("\nvo_datadask: ", vo_datadask)
             print("Slicing vo for the time period")
-            start_time, end_time = time_window_strings(year_start, num_years, time_type = type(vo_datadask.time.values[0]))
             vo_datadask_sel = vo_datadask.sel(time=slice(start_time, end_time))
             print("Averaging vo")
             vo = vo_datadask_sel["vo"].weighted(vo_datadask_sel.time.dt.days_in_month).mean(dim="time")
@@ -325,7 +321,7 @@ if __name__ == '__main__':
         print("Loading mlotst data")
         mlotst_datadask = select_latest_data(searched_cat,
             dict(
-                chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
             ),
             variable_id = "mlotst",
             member_id = member,
@@ -333,7 +329,6 @@ if __name__ == '__main__':
         )
         print("\nmlotst_datadask: ", mlotst_datadask)
         print("Slicing mlotst for the time period")
-        start_time, end_time = time_window_strings(year_start, num_years, time_type = type(mlotst_datadask.time.values[0]))
         mlotst_datadask_sel = mlotst_datadask.sel(time=slice(start_time, end_time))
         print("Averaging mlotst (mean of the yearly maximum of monthly data)")
         mlotst_yearlymax = mlotst_datadask_sel.groupby("time.year").max(dim="time")
@@ -350,7 +345,7 @@ if __name__ == '__main__':
             print("Loading agessc data")
             agessc_datadask = select_latest_data(searched_cat,
                 dict(
-                    chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                    # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
                 ),
                 variable_id = "agessc",
                 member_id = member,
@@ -358,7 +353,6 @@ if __name__ == '__main__':
             )
             print("\nagessc_datadask: ", agessc_datadask)
             print("Slicing agessc for the time period")
-            start_time, end_time = time_window_strings(year_start, num_years, time_type = type(agessc_datadask.time.values[0]))
             agessc_datadask_sel = agessc_datadask.sel(time=slice(start_time, end_time))
             print("Averaging agessc")
             agessc = agessc_datadask_sel["agessc"].weighted(agessc_datadask_sel.time.dt.days_in_month).mean(dim="time")
