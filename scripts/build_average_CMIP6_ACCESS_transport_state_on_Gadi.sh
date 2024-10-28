@@ -6,7 +6,7 @@
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB
 #PBS -l walltime=12:00:00
-#PBS -l storage=gdata/xv83+gdata/dk92+gdata/fs38+gdata/hh5
+#PBS -l storage=gdata/xv83+gdata/oi10+gdata/dk92+gdata/hh5+gdata/rr3+gdata/al33+gdata/fs38+gdata/xp65+gdata/p73
 #PBS -l wd
 #PBS -o output/PBS/
 #PBS -j oe
@@ -24,7 +24,8 @@ echo "Loading python3/3.12.1"
 module load python3/3.12.1
 
 # CHANGE HERE the model, experiment, ensemble, etc.
-model=ACCESS-ESM1-5
+# model=ACCESS-ESM1-5
+model=ACCESS-CM2
 experiment=historical
 ensemble=r1i1p1f1 # <- note that this is not used in the script
 year_start=1990
