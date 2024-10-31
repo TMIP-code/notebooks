@@ -379,6 +379,10 @@ if __name__ == '__main__':
             print("\nmlotst: ", mlotst)
             print("Saving mlotst to: ", f'{outputdir}/mlotst.nc')
             mlotst.to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
+            mlotst_max = mlotst_datadask_sel.max(dim="time")
+            print("\nmlotst_max: ", mlotst_max)
+            print("Saving mlotst_max to: ", f'{outputdir}/mlotst_max.nc')
+            mlotst_max.to_netcdf(f'{outputdir}/mlotst_max.nc', compute=True)
         except Exception:
             print(f'Error processing {model} {member} mlotst')
             print(traceback.format_exc())
