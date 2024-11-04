@@ -5,7 +5,7 @@
 #PBS -l ncpus=28
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB
-#PBS -l walltime=24:00:00
+#PBS -l walltime=12:00:00
 #PBS -l storage=gdata/xv83+gdata/dk92+gdata/hh5+gdata/xp65+gdata/p73+scratch/p66
 #PBS -l wd
 #PBS -o output/PBS/
@@ -30,7 +30,7 @@ experiment=historical
 
 
 echo "Running transport-state script"
-python scripts/get_monthly_transport_terms_nonCMIParchive.py $model $experiment \
+python scripts/archive_unarchived_CMIP6_ACCESS_GM_files.py $model $experiment \
 &> output/$PBS_JOBID.$model.monthly.datafromTilo.out
 
 

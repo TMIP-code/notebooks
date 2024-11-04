@@ -1,12 +1,12 @@
 #!/bin/bash
 
 #PBS -P xv83
-#PBS -N CMIP6_ACCESS_preprocessing
+#PBS -N average_TiloZ_data
 #PBS -l ncpus=28
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB
 #PBS -l walltime=12:00:00
-#PBS -l storage=gdata/xv83+gdata/oi10+gdata/dk92+gdata/hh5+gdata/rr3+gdata/al33+gdata/fs38+gdata/xp65+gdata/p73
+#PBS -l storage=gdata/xv83+gdata/dk92+gdata/hh5+gdata/xp65+gdata/p73+scratch/p66
 #PBS -l wd
 #PBS -o output/PBS/
 #PBS -j oe
@@ -27,12 +27,11 @@ module load python3/3.12.1
 model=ACCESS-ESM1-5
 # model=ACCESS-CM2
 experiment=historical
-ensemble=r1i1p1f1 # <- note that this is not used in the script
 year_start=1990
 num_years=10
 
 echo "Running transport-state script"
-python scripts/build_average_CMIP6_ACCESS_transport_state_on_Gadi.py $model $experiment $ensemble $year_start $num_years \
-&> output/$model.$experiment.allensembles.$year_start.$num_years.$PBS_JOBID.out
+python scripts/average_unarchived_CMIP6_ACCESS_GM_variables.py $model $experiment $year_start $num_years \
+&> output/$PBS_JOBID.average.$model.$experiment.datafromTilo.$year_start.$num_years.out
 
 
