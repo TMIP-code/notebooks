@@ -44,8 +44,9 @@ import traceback
 scratchdatadir = '/scratch/xv83/TMIP/data'
 gdatadatadir = '/g/data/xv83/TMIP/data'
 
-members = ["HI-05", "HI-06", "HI-07", "HI-08"]
-# members = ["HI-05", "HI-06"]
+# members = ["HI-05", "HI-06", "HI-07", "HI-08"]
+members = ["HI-09", "HI-10", "HI-11", "HI-12"]
+
 year_start = 1850
 # year_start = 1990
 year_end = 2015
