@@ -6,6 +6,10 @@ import sys
 # interactive use only
 model="ACCESS-ESM1-5"
 experiment="historical"
+# year_start = 1850
+year_start = 1940
+# year_end = 2015
+year_end = 1950
 
 
 # Model etc. defined from script input
@@ -13,7 +17,12 @@ model = sys.argv[1]
 print("Model: ", model, " (type: ", type(model), ")")
 experiment = sys.argv[2]
 print("Experiment: ", experiment, " (type: ", type(experiment), ")")
-
+members = sys.argv[3].split(',')
+print("members: ", members, " (type: ", type(members), ")")
+year_start = int(sys.argv[4])
+print("year_start: ", year_start, " (type: ", type(year_start), ")")
+year_end = int(sys.argv[5])
+print("year_end: ", year_end, " (type: ", type(year_end), ")")
 
 # 1. Load packages
 
@@ -45,19 +54,19 @@ scratchdatadir = '/scratch/xv83/TMIP/data'
 gdatadatadir = '/g/data/xv83/TMIP/data'
 
 # members = ["HI-05", "HI-06", "HI-07", "HI-08"]
-members = ["HI-09", "HI-10", "HI-11", "HI-12"]
+# members = ["HI-09", "HI-10", "HI-11", "HI-12"]
+# members = ["HI-05"]
 
-year_start = 1850
-# year_start = 1990
-year_end = 2015
-# year_end = 1990
 
 
 print("Starting client")
 
 # This `if` statement is required in scripts (not required in Jupyter)
 if __name__ == '__main__':
-    client = Client(n_workers=24) #, threads_per_worker=1, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
+    client = Client(n_workers=24, threads_per_worker=1)
+    #, threads_per_worker=1, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
+    # added threads_per_worker=1 back again because I possibly hitting some random unsafe multithreading issue:
+    # https://forum.access-hive.org.au/t/netcdf-not-a-valid-id-errors/389
 
 
     for member in members:
