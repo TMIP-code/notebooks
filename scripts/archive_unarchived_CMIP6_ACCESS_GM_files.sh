@@ -28,11 +28,11 @@ model=ACCESS-ESM1-5
 # model=ACCESS-CM2
 experiment=historical
 # year_start=1850
-year_start=1890
+year_start=1960
 # year_end=2015
-year_end=1900
+year_end=1970
 # members=("HI-05","HI-06")
-members=("HI-07")
+members=("HI-12")
 
 
 echo "Running transport-state script"

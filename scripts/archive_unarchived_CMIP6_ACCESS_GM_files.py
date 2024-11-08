@@ -84,14 +84,12 @@ if __name__ == '__main__':
 
             print(f'\nDecade {decade}')
 
-            # subset of the files required
-            # paths = [f'{inputdir}/history/ocn/ocean_month.nc-{year}1231' for year in range(year_start, year_end)]
-            # paths = [f'{inputdir}/history/ocn/ocean_month.nc-{year}1231' for year in range(1990, 2000)]
             if decade == 2010:
                 num_years = 5
             else:
                 num_years = 10
 
+            # subset of the files required
             paths = [f'{inputdir}/ocean_month.nc-{year}1231' for year in range(decade, decade + num_years)]
 
             # Exit early if cannot find all files

@@ -78,7 +78,7 @@ if __name__ == '__main__':
 
         for decade in range(year_start, year_end, 10):
 
-            print(f'  {decade}s')
+            # print(f'  {decade}s')
 
             # subset of the files required
             # paths = [f'{inputdir}/history/ocn/ocean_month.nc-{year}1231' for year in range(year_start, year_end)]
@@ -170,7 +170,7 @@ if __name__ == '__main__':
                 print(traceback.format_exc())
 
             if not tx_trans_gm.equals(tx_trans_gm2):
-                print(f'    tx_trans_gm does not match')
+                print(f'  {decade}s tx_trans_gm does not match')
 
             # ty_trans_gm
             try:
@@ -181,7 +181,7 @@ if __name__ == '__main__':
                 print(traceback.format_exc())
 
             if not ty_trans_gm.equals(ty_trans_gm2):
-                print(f'    ty_trans_gm does not match')
+                print(f'  {decade}s ty_trans_gm does not match')
 
             # tx_trans_submeso
             try:
@@ -192,7 +192,7 @@ if __name__ == '__main__':
                 print(traceback.format_exc())
 
             if not tx_trans_submeso.equals(tx_trans_submeso2):
-                print(f'    tx_trans_submeso does not match')
+                print(f'  {decade}s tx_trans_submeso does not match')
 
             # ty_trans_submeso
             try:
@@ -203,7 +203,7 @@ if __name__ == '__main__':
                 print(traceback.format_exc())
 
             if not ty_trans_submeso.equals(ty_trans_submeso2):
-                print(f'    ty_trans_submeso does not match')
+                print(f'  {decade}s ty_trans_submeso does not match')
 
 
 
