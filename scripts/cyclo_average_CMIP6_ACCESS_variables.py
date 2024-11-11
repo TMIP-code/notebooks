@@ -34,13 +34,13 @@ model = sys.argv[1]
 print("Model: ", model, " (type: ", type(model), ")")
 experiment = sys.argv[2]
 print("Experiment: ", experiment, " (type: ", type(experiment), ")")
-ensemble = sys.argv[3]
+ensemble = sys.argv[3] # <- not used since I now loop over all members
 print("Ensemble member: ", ensemble, " (type: ", type(ensemble), ")")
 year_start = int(sys.argv[4])
 num_years = int(sys.argv[5])
 print("Time window: ", year_start, " to ", year_start + num_years - 1)
-lumpby = int(sys.argv[6]) # "month" or "season"
-print("Lumping by ", lumpby)
+lumpby = sys.argv[6] # "month" or "season"
+print("Lumping by", lumpby)
 
 seasons = ("DJF", "MAM", "JJA", "SON")
 months = range(1, 13) # Ugh! Zero-based indexing!
@@ -71,6 +71,9 @@ from xmip.preprocessing import combined_preprocessing
 
 # Load traceback to print exceptions
 import traceback
+
+# Import numpy
+import numpy as np
 
 # Load pandas for data manipulation
 import pandas as pd
@@ -154,7 +157,7 @@ def month_climatology(ds):
 def climatology(ds, lumpby):
     if lumpby == "month":
         return month_climatology(ds)
-    else if lumpby == "season":
+    elif lumpby == "season":
         return season_climatology(ds)
     else:
         raise ValueError(f"lumpby has to be month or season")

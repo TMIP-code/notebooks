@@ -31,6 +31,7 @@ ensemble=r1i1p1f1 # <- note that this is not used in the script
 year_start=1990
 num_years=10
 lumpby=month
+# lumpby=season
 
 echo "Running transport-state script"
 python scripts/cyclo_average_CMIP6_ACCESS_variables.py $model $experiment $ensemble $year_start $num_years $lumpby \
