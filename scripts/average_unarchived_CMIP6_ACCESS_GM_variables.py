@@ -114,6 +114,8 @@ if __name__ == '__main__':
         # directory to save the data to (as NetCDF)
         inputdir = f'{gdatadatadir}/{model}/{CSIRO_member(member)}'
         outputdir = f'{scratchdatadir}/{model}/{experiment}/{CMIP6_member(member)}/{start_time_str}-{end_time_str}'
+        print("Creating directory: ", outputdir)
+        os.makedirs(outputdir, exist_ok=True)
         print("  averaging data from: ", inputdir)
         print("  to be saved in: ", outputdir)
 

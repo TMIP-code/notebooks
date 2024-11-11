@@ -27,7 +27,7 @@ module load python3/3.12.1
 model=ACCESS-ESM1-5
 # model=ACCESS-CM2
 experiment=historical
-year_start=1990
+year_start=1850
 num_years=10
 
 echo "Running transport-state script"

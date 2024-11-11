@@ -28,11 +28,12 @@ model=ACCESS-ESM1-5
 # model=ACCESS-CM2
 experiment=historical
 ensemble=r1i1p1f1 # <- note that this is not used in the script
-year_start=1850
+year_start=1990
 num_years=10
+lumpby=month
 
 echo "Running transport-state script"
-python scripts/average_CMIP6_ACCESS_variables.py $model $experiment $ensemble $year_start $num_years \
-&> output/$model.$experiment.allensembles.$year_start.$num_years.$PBS_JOBID.out
+python scripts/cyclo_average_CMIP6_ACCESS_variables.py $model $experiment $ensemble $year_start $num_years $lumpby \
+&> output/cyclo.$model.$experiment.allensembles.$year_start.$num_years.$PBS_JOBID.out
 
 
