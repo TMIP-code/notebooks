@@ -2,10 +2,10 @@
 
 #PBS -P xv83
 #PBS -N archive_GM
-#PBS -l ncpus=28
+#PBS -l ncpus=48
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB
-#PBS -l walltime=1:00:00
+#PBS -l walltime=24:00:00
 #PBS -l storage=gdata/xv83+gdata/dk92+gdata/hh5+gdata/xp65+gdata/p73+scratch/p66
 #PBS -l wd
 #PBS -o output/PBS/
@@ -23,20 +23,22 @@ conda info
 echo "Loading python3/3.12.1"
 module load python3/3.12.1
 
-# CHANGE HERE the model, experiment, ensemble, etc.
+# CHANGE HERE the model, experiment, members, decades.
 model=ACCESS-ESM1-5
 # model=ACCESS-CM2
+
 experiment=historical
-# year_start=1850
-year_start=1960
-# year_end=2015
-year_end=1970
-# members=("HI-05","HI-06")
-members=("HI-12")
+members=("HI-37","HI-38","HI-39","HI-40","HI-41","HI-42","HI-43","HI-44")
+decade_start=1850
+decade_end=2020
+# experiment=ssp370
+# members=("SSP-370-39","SSP-370-40","SSP-370-41","SSP-370-42","SSP-370-43","SSP-370-44")
+# decade_start=2010
+# decade_end=2100
 
 
 echo "Running transport-state script"
-python scripts/archive_unarchived_CMIP6_ACCESS_GM_files.py $model $experiment $members $year_start $year_end \
+python scripts/archive_unarchived_CMIP6_ACCESS_GM_files.py $model $experiment $members $decade_start $decade_end \
 &> output/$PBS_JOBID.$model.monthly.datafromTilo.out
 
 

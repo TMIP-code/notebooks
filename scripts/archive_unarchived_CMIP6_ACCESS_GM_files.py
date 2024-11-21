@@ -6,10 +6,10 @@ import sys
 # interactive use only
 model="ACCESS-ESM1-5"
 experiment="historical"
-# year_start = 1850
-year_start = 1940
-# year_end = 2015
-year_end = 1950
+# decade_start = 1850
+decade_start = 1940
+# decade_end = 2015
+decade_end = 1950
 
 
 # Model etc. defined from script input
@@ -19,10 +19,10 @@ experiment = sys.argv[2]
 print("Experiment: ", experiment, " (type: ", type(experiment), ")")
 members = sys.argv[3].split(',')
 print("members: ", members, " (type: ", type(members), ")")
-year_start = int(sys.argv[4])
-print("year_start: ", year_start, " (type: ", type(year_start), ")")
-year_end = int(sys.argv[5])
-print("year_end: ", year_end, " (type: ", type(year_end), ")")
+decade_start = int(sys.argv[4])
+print("decade_start: ", decade_start, " (type: ", type(decade_start), ")")
+decade_end = int(sys.argv[5])
+print("decade_end: ", decade_end, " (type: ", type(decade_end), ")")
 
 # 1. Load packages
 
@@ -45,6 +45,20 @@ import traceback
 # # Load xmip for preprocessing (trying to get consistent metadata for making matrices down the road)
 # from xmip.preprocessing import combined_preprocessing
 
+decades = range(decade_start, decade_end, 10)
+print(f"\nDecades:\n")
+print(*decades)
+
+# Historical runs go from 1850 to 2015, and future scenarios from 2015 to 2100.
+# I want to save data per decade, so I need some logic branching to deal with the 2010s.
+def decade_years(decade, experiment):
+    if decade == 2010:
+        if (experiment == "historical"):
+            return range(2010, 2015)
+        else:
+            return range(2015, 2020)
+    else:
+        return range(decade, decade + 10)
 
 
 
@@ -57,13 +71,11 @@ gdatadatadir = '/g/data/xv83/TMIP/data'
 # members = ["HI-09", "HI-10", "HI-11", "HI-12"]
 # members = ["HI-05"]
 
-
-
 print("Starting client")
 
 # This `if` statement is required in scripts (not required in Jupyter)
 if __name__ == '__main__':
-    client = Client(n_workers=24, threads_per_worker=1)
+    client = Client(n_workers=40, threads_per_worker=1)
     #, threads_per_worker=1, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
     # added threads_per_worker=1 back again because I possibly hitting some random unsafe multithreading issue:
     # https://forum.access-hive.org.au/t/netcdf-not-a-valid-id-errors/389
@@ -72,29 +84,31 @@ if __name__ == '__main__':
     for member in members:
 
         # print ensemble/member
-        inputdir = f'/scratch/p66/pbd562/petrichor/get/{member}/history/ocn'
-        outputdir = f'{gdatadatadir}/{model}/{member}'
+        if experiment == "historical":
+            inputdir = f'/scratch/p66/pbd562/petrichor/get/{member}/history/ocn'
+        else:
+            inputdir = f'/scratch/p66/pbd562/petrichor/get/{experiment}/{member}/history/ocn'
+
+        outputdir = f'{gdatadatadir}/{model}/{experiment}/{member}'
         print(f"\nProcessing {member}")
 
         # directory to save the data to (as NetCDF)
         print("Creating directory: ", outputdir)
         os.makedirs(outputdir, exist_ok=True)
 
-        for decade in range(year_start, year_end, 10):
+        for decade in decades:
 
-            print(f'\nDecade {decade}')
+            print(f'\nDecade {decade}:\n')
 
-            if decade == 2010:
-                num_years = 5
-            else:
-                num_years = 10
+            years = decade_years(decade, experiment)
+            print(*years)
 
             # subset of the files required
-            paths = [f'{inputdir}/ocean_month.nc-{year}1231' for year in range(decade, decade + num_years)]
+            paths = [f'{inputdir}/ocean_month.nc-{year}1231' for year in years]
 
             # Exit early if cannot find all files
             if not all([os.path.isfile(fname) for fname in paths]):
-                print(f'Missing files for {member} {decade}-{decade + num_years}')
+                print(f'Missing files for {member} {decade}s')
                 continue
 
             # load the data

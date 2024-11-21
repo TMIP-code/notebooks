@@ -3,8 +3,8 @@
 
 # required variables for building the transport matrix are:
 # - monthly variables:
-#   - umo (or uo)
-#   - vmo (or uo)
+#   - umo
+#   - vmo
 #   - mlotst (average of the yearly maximum of the mixed layer)
 # - fixed variables (not need for any preprocessing, but listed here for completeness):
 #   - areacello
@@ -21,26 +21,16 @@
 # import sys to access script arguments (experiment, ensemble, first_year, last_year)
 import sys
 
-# interactive use only
-model="ACCESS-ESM1-5"
-experiment="historical"
-ensemble="r1i1p1f1" # <- note that this is not used in the script
-year_start=1990
-num_years=10
-
-
 # Model etc. defined from script input
 model = sys.argv[1]
 print("Model: ", model, " (type: ", type(model), ")")
 experiment = sys.argv[2]
 print("Experiment: ", experiment, " (type: ", type(experiment), ")")
-ensemble = sys.argv[3] # <- not used since I now loop over all members
-print("Ensemble member: ", ensemble, " (type: ", type(ensemble), ")")
+ensemble = sys.argv[3]
+print("Ensemble ensemble: ", ensemble, " (type: ", type(ensemble), ")")
 year_start = int(sys.argv[4])
 num_years = int(sys.argv[5])
 print("Time window: ", year_start, " to ", year_start + num_years - 1)
-lumpby = sys.argv[6] # "month" or "season"
-print("Lumping by", lumpby)
 
 # 1. Load packages
 
@@ -68,9 +58,6 @@ from xmip.preprocessing import combined_preprocessing
 
 # Load traceback to print exceptions
 import traceback
-
-# Import numpy
-import numpy as np
 
 # Load pandas for data manipulation
 import pandas as pd
@@ -123,60 +110,29 @@ def select_latest_data(cat, xarray_open_kwargs, **kwargs):
         xarray_open_kwargs=xarray_open_kwargs,
         xarray_combine_by_coords_kwargs=xarray_combine_by_coords_kwargs,
         parallel=True,
-        preprocess=combined_preprocessing,
+        # preprocess=combined_preprocessing, <- xmip does not work for CMIP5 data ATM
     )
     return datadask
 
-def season_climatology(ds):
-    # Make a DataArray with the number of days in each month, size = len(time)
-    month_length = ds.time.dt.days_in_month
-    # Calculate the weights by grouping by 'time.season'
-    weights = (
-        month_length.groupby("time.season") / month_length.groupby("time.season").sum()
-    )
-    # Test that the sum of the weights for each season is 1.0
-    np.testing.assert_allclose(weights.groupby("time.season").sum().values, np.ones(4))
-    # Calculate the weighted average
-    return (ds * weights).groupby("time.season").sum(dim="time")
-
-def month_climatology(ds):
-    # Make a DataArray with the number of days in each month, size = len(time)
-    month_length = ds.time.dt.days_in_month
-    # Calculate the weights by grouping by 'time.season'
-    weights = (
-        month_length.groupby("time.month") / month_length.groupby("time.month").sum()
-    )
-    # Test that the sum of the weights for each month is 1.0
-    np.testing.assert_allclose(weights.groupby("time.month").sum().values, np.ones(12))
-    # Calculate the weighted average
-    return (ds * weights).groupby("time.month").sum(dim="time")
-
-def climatology(ds, lumpby):
-    if lumpby == "month":
-        return month_climatology(ds)
-    elif lumpby == "season":
-        return season_climatology(ds)
-    else:
-        raise ValueError(f"lumpby has to be month or season")
 
 
 # 3. Load catalog
 
 catalogs = intake.cat.access_nri
-cat = catalogs["cmip6_fs38"]
+cat = catalogs["cmip5_rr3"]
 print(cat)
 
 # Only keep the required data
 searched_cat = cat.search(
-    source_id = model,
-    experiment_id = experiment,
-    # member_id = ensemble,
-    variable_id = ["uo", "vo", "umo", "vmo", "mlotst", "volcello", "areacello", "agessc", "thetao", "so"],
+    model = model,
+    experiment = experiment,
+    # ensemble = ensemble,
+    variable = ["uo", "vo", "umo", "vmo", "mlotst", "volcello", "areacello", "agessc", "thetao", "so"],
     realm = 'ocean')
 print(searched_cat)
 
-cmip_version = "CMIP6"
-# Find members that have all the required data
+cmip_version = "CMIP5"
+# Find ensembles that have all the required data
 def summary_variable_availability(df, cmip_version):
     if cmip_version == "CMIP6":
         variable_id = 'variable_id'
@@ -212,28 +168,28 @@ def summary_variable_availability(df, cmip_version):
     merged_result = pd.merge(final_result_1, final_result_2, on=[experiment_id, source_id], how='outer', suffixes=('_umo_vmo', '_uo_vo'))
     return merged_result
 
-# Find members that have all the required data (umo+vmo or uo+vo + all the rest)
+# Find ensembles that have all the required data (umo+vmo or uo+vo + all the rest)
 availability_df = summary_variable_availability(cat.df, cmip_version)
-# grab members to loop over
-availability_df = availability_df[(availability_df.source_id == model) & (availability_df.experiment_id == experiment)]
-[members1] = availability_df.member_id_umo_vmo
-[members2] = availability_df.member_id_uo_vo
-members = list(set(members1) & set(members2))
+# grab ensembles to loop over
+availability_df = availability_df[(availability_df.model == model) & (availability_df.experiment == experiment)]
+[ensembles1] = availability_df.ensemble_umo_vmo
+[ensembles2] = availability_df.ensemble_uo_vo
+ensembles = list(set(ensembles1) & set(ensembles2))
 
-# sort members that are formatted as "r%di%dp%df%d" where %d is a integer
+# sort ensembles that are formatted as "r%di%dp%df%d" where %d is a integer
 import re
 
-def extract_numbers(member):
+def extract_numbers(ensemble):
     # Extract integers from the string using regex
-    return list(map(int, re.findall(r'\d+', member)))
+    return list(map(int, re.findall(r'\d+', ensemble)))
 
-def sort_members(members):
-    # Sort members using the custom key function
-    return sorted(members, key=extract_numbers)
+def sort_ensembles(ensembles):
+    # Sort ensembles using the custom key function
+    return sorted(ensembles, key=extract_numbers)
 
-sorted_members = sort_members(members)
-# print members on one line each
-print("\n".join(sorted_members))
+sorted_ensembles = sort_ensembles(ensembles)
+# print ensembles on one line each
+print("\n".join(sorted_ensembles))
 
 
 # Create directory on scratch to save the data
@@ -250,56 +206,60 @@ print("Starting client")
 
 # This `if` statement is required in scripts (not required in Jupyter)
 if __name__ == '__main__':
-    client = Client(n_workers=4, threads_per_worker=1)#, threads_per_worker=1, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
+    client = Client(n_workers=4)#, threads_per_worker=1, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
 
-    for member in sorted_members[0:1]:
+    for ensemble in sorted_ensembles:
+
+        # skip if r0i0p0
+        if ensemble == "r0i0p0":
+            continue
 
         # print ensemble/member
-        print(f"\nProcessing member: {member}")
+        print(f"\nProcessing ensemble: {ensemble}")
 
         # directory to save the data to (as NetCDF)
-        outputdir = f'{datadir}/{model}/{experiment}/{member}/{start_time_str}-{end_time_str}/cyclo{lumpby}'
+        outputdir = f'{datadir}/{model}/{experiment}/{ensemble}/{start_time_str}-{end_time_str}'
         print("Creating directory: ", outputdir)
         makedirs(outputdir, exist_ok=True)
 
-        # # volcello
-        # try:
-        #     print("Loading volcello data")
-        #     volcello_datadask = select_latest_data(searched_cat,
-        #         dict(
-        #             chunks={'time': -1, 'lev':-1}
-        #         ),
-        #         variable_id = "volcello",
-        #         member_id = member,
-        #         table_id = "Ofx",
-        #     )
-        #     print("\nvolcello_datadask: ", volcello_datadask)
-        #     volcello_file = f'{outputdir}/volcello.nc'
-        #     print("Saving volcello to: ", volcello_file)
-        #     volcello_datadask.to_netcdf(volcello_file, compute=True)
-        # except Exception:
-        #     print(f'Error processing {model} {member} volcello')
-        #     print(traceback.format_exc())
+        # volcello
+        try:
+            print("Loading volcello data")
+            volcello_datadask = select_latest_data(searched_cat,
+                dict(
+                    chunks={'time': -1, 'lev':-1}
+                ),
+                variable = "volcello",
+                ensemble = "r0i0p0", # <- in the CMIP5 ACCESS catalog, the fixed data is in ensemble r0i0p0 (not in any other ensemble)
+                table = "fx", # <- in the CMIP5 ACCESS catalog, the fixed data table is "fx" (not "Ofx")
+            )
+            print("\nvolcello_datadask: ", volcello_datadask)
+            volcello_file = f'{outputdir}/volcello.nc'
+            print("Saving volcello to: ", volcello_file)
+            volcello_datadask.to_netcdf(volcello_file, compute=True)
+        except Exception:
+            print(f'Error processing {model} {ensemble} volcello')
+            print(traceback.format_exc())
 
 
-        # # areacello
-        # try:
-        #     print("Loading areacello data")
-        #     areacello_datadask = select_latest_data(searched_cat,
-        #         dict(
-        #             chunks={'time': -1, 'lev':-1}
-        #         ),
-        #         variable_id = "areacello",
-        #         member_id = member,
-        #         table_id = "Ofx",
-        #     )
-        #     print("\nareacello_datadask: ", areacello_datadask)
-        #     areacello_file = f'{outputdir}/areacello.nc'
-        #     print("Saving areacello to: ", areacello_file)
-        #     areacello_datadask.to_netcdf(areacello_file, compute=True)
-        # except Exception:
-        #     print(f'Error processing {model} {member} areacello')
-        #     print(traceback.format_exc())
+        # areacello
+        try:
+            print("Loading areacello data")
+            areacello_datadask = select_latest_data(searched_cat,
+                dict(
+                    chunks={'time': -1, 'lev':-1}
+                ),
+                variable = "areacello",
+                ensemble = "r0i0p0", # <- in the CMIP5 ACCESS catalog, the fixed data is in ensemble r0i0p0 (not in any other ensemble)
+                table = "fx", # <- in the CMIP5 ACCESS catalog, the fixed data table is "fx" (not "Ofx")
+            )
+            print("\nareacello_datadask: ", areacello_datadask)
+            areacello_file = f'{outputdir}/areacello.nc'
+            print("Saving areacello to: ", areacello_file)
+            areacello_datadask.to_netcdf(areacello_file, compute=True)
+        except Exception:
+            print(f'Error processing {model} {ensemble} areacello')
+            print(traceback.format_exc())
 
 
         # umo
@@ -309,20 +269,20 @@ if __name__ == '__main__':
                 dict(
                     chunks={'time': -1, 'lev':-1}
                 ),
-                variable_id = "umo",
-                member_id = member,
+                variable = "umo",
+                ensemble = ensemble,
                 frequency = "mon",
             )
             print("\numo_datadask: ", umo_datadask)
             print("Slicing umo for the time period")
             umo_datadask_sel = umo_datadask.sel(time=slice(start_time, end_time))
-            print(f"Averaging umo over each {lumpby}")
-            umo = climatology(umo_datadask_sel["umo"], lumpby)
+            print("Averaging umo")
+            umo = umo_datadask_sel["umo"].weighted(umo_datadask_sel.time.dt.days_in_month).mean(dim="time")
             print("\numo: ", umo)
             print("Saving umo to: ", f'{outputdir}/umo.nc')
-            umo.to_dataset(name='umo').to_netcdf(f'{outputdir}/umo.nc', compute=True)
+            umo.to_netcdf(f'{outputdir}/umo.nc', compute=True)
         except Exception:
-            print(f'Error processing {model} {member} umo')
+            print(f'Error processing {model} {ensemble} umo')
             print(traceback.format_exc())
 
         # vmo
@@ -332,20 +292,20 @@ if __name__ == '__main__':
                 dict(
                     chunks={'time': -1, 'lev':-1}
                 ),
-                variable_id = "vmo",
-                member_id = member,
+                variable = "vmo",
+                ensemble = ensemble,
                 frequency = "mon",
             )
             print("\nvmo_datadask: ", vmo_datadask)
             print("Slicing vmo for the time period")
             vmo_datadask_sel = vmo_datadask.sel(time=slice(start_time, end_time))
-            print(f"Averaging vmo over each {lumpby}")
-            vmo = climatology(vmo_datadask_sel["vmo"], lumpby)
+            print("Averaging vmo")
+            vmo = vmo_datadask_sel["vmo"].weighted(vmo_datadask_sel.time.dt.days_in_month).mean(dim="time")
             print("\nvmo: ", vmo)
             print("Saving vmo to: ", f'{outputdir}/vmo.nc')
-            vmo.to_dataset(name='vmo').to_netcdf(f'{outputdir}/vmo.nc', compute=True)
+            vmo.to_netcdf(f'{outputdir}/vmo.nc', compute=True)
         except Exception:
-            print(f'Error processing {model} {member} vmo')
+            print(f'Error processing {model} {ensemble} vmo')
             print(traceback.format_exc())
 
         # uo
@@ -355,20 +315,20 @@ if __name__ == '__main__':
                 dict(
                     chunks={'time': -1, 'lev':-1}
                 ),
-                variable_id = "uo",
-                member_id = member,
+                variable = "uo",
+                ensemble = ensemble,
                 frequency = "mon",
             )
             print("\nuo_datadask: ", uo_datadask)
             print("Slicing uo for the time period")
             uo_datadask_sel = uo_datadask.sel(time=slice(start_time, end_time))
-            print(f"Averaging uo over each {lumpby}")
-            uo = climatology(uo_datadask_sel["uo"], lumpby)
+            print("Averaging uo")
+            uo = uo_datadask_sel["uo"].weighted(uo_datadask_sel.time.dt.days_in_month).mean(dim="time")
             print("\nuo: ", uo)
             print("Saving uo to: ", f'{outputdir}/uo.nc')
-            uo.to_dataset(name='uo').to_netcdf(f'{outputdir}/uo.nc', compute=True)
+            uo.to_netcdf(f'{outputdir}/uo.nc', compute=True)
         except Exception:
-            print(f'Error processing {model} {member} uo')
+            print(f'Error processing {model} {ensemble} uo')
             print(traceback.format_exc())
 
         # vo
@@ -378,20 +338,20 @@ if __name__ == '__main__':
                 dict(
                     chunks={'time': -1, 'lev':-1}
                 ),
-                variable_id = "vo",
-                member_id = member,
+                variable = "vo",
+                ensemble = ensemble,
                 frequency = "mon",
             )
             print("\nvo_datadask: ", vo_datadask)
             print("Slicing vo for the time period")
             vo_datadask_sel = vo_datadask.sel(time=slice(start_time, end_time))
-            print(f"Averaging vo over each {lumpby}")
-            vo = climatology(vo_datadask_sel["vo"], lumpby)
+            print("Averaging vo")
+            vo = vo_datadask_sel["vo"].weighted(vo_datadask_sel.time.dt.days_in_month).mean(dim="time")
             print("\nvo: ", vo)
             print("Saving vo to: ", f'{outputdir}/vo.nc')
-            vo.to_dataset(name='vo').to_netcdf(f'{outputdir}/vo.nc', compute=True)
+            vo.to_netcdf(f'{outputdir}/vo.nc', compute=True)
         except Exception:
-            print(f'Error processing {model} {member} vo')
+            print(f'Error processing {model} {ensemble} vo')
             print(traceback.format_exc())
 
         # mlotst dataset
@@ -401,20 +361,22 @@ if __name__ == '__main__':
                 dict(
                     chunks={'time': -1, 'lev':-1}
                 ),
-                variable_id = "mlotst",
-                member_id = member,
+                variable = "mlotst",
+                ensemble = ensemble,
                 frequency = "mon",
             )
             print("\nmlotst_datadask: ", mlotst_datadask)
             print("Slicing mlotst for the time period")
             mlotst_datadask_sel = mlotst_datadask.sel(time=slice(start_time, end_time))
-            print(f"Averaging mlotst over each {lumpby}")
-            mlotst = climatology(mlotst_datadask_sel["mlotst"], lumpby)
+            print("Averaging mlotst (mean of the yearly maximum of monthly data)")
+            mlotst_yearlymax = mlotst_datadask_sel.groupby("time.year").max(dim="time")
+            print("\nmlotst_yearlymax: ", mlotst_yearlymax)
+            mlotst = mlotst_yearlymax.mean(dim="year")
             print("\nmlotst: ", mlotst)
             print("Saving mlotst to: ", f'{outputdir}/mlotst.nc')
-            mlotst.to_dataset(name='mlotst').to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
+            mlotst.to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
         except Exception:
-            print(f'Error processing {model} {member} mlotst')
+            print(f'Error processing {model} {ensemble} mlotst')
             print(traceback.format_exc())
 
         # thetao dataset
@@ -424,20 +386,20 @@ if __name__ == '__main__':
                 dict(
                     chunks={'time': -1, 'lev':-1}
                 ),
-                variable_id = "thetao",
-                member_id = member,
+                variable = "thetao",
+                ensemble = ensemble,
                 frequency = "mon",
             )
             print("\nthetao_datadask: ", thetao_datadask)
             print("Slicing thetao for the time period")
             thetao_datadask_sel = thetao_datadask.sel(time=slice(start_time, end_time))
-            print(f"Averaging thetao over each {lumpby}")
-            thetao = climatology(thetao_datadask_sel["thetao"], lumpby)
+            print("Averaging thetao")
+            thetao = thetao_datadask_sel.weighted(thetao_datadask_sel.time.dt.days_in_month).mean(dim="time")
             print("\nthetao: ", thetao)
             print("Saving thetao to: ", f'{outputdir}/thetao.nc')
-            thetao.to_dataset(name='thetao').to_netcdf(f'{outputdir}/thetao.nc', compute=True)
+            thetao.to_netcdf(f'{outputdir}/thetao.nc', compute=True)
         except Exception:
-            print(f'Error processing {model} {member} thetao')
+            print(f'Error processing {model} {ensemble} thetao')
             print(traceback.format_exc())
 
         # so dataset
@@ -447,22 +409,44 @@ if __name__ == '__main__':
                 dict(
                     chunks={'time': -1, 'lev':-1}
                 ),
-                variable_id = "so",
-                member_id = member,
+                variable = "so",
+                ensemble = ensemble,
                 frequency = "mon",
             )
             print("\nso_datadask: ", so_datadask)
             print("Slicing so for the time period")
             so_datadask_sel = so_datadask.sel(time=slice(start_time, end_time))
-            print(f"Averaging so over each {lumpby}")
-            so = climatology(so_datadask_sel["so"], lumpby)
+            print("Averaging so")
+            so = so_datadask_sel.weighted(so_datadask_sel.time.dt.days_in_month).mean(dim="time")
             print("\nso: ", so)
             print("Saving so to: ", f'{outputdir}/so.nc')
-            so.to_dataset(name='so').to_netcdf(f'{outputdir}/so.nc', compute=True)
+            so.to_netcdf(f'{outputdir}/so.nc', compute=True)
         except Exception:
-            print(f'Error processing {model} {member} so')
+            print(f'Error processing {model} {ensemble} so')
             print(traceback.format_exc())
 
+        # agessc dataset
+        try:
+            print("Loading agessc data")
+            agessc_datadask = select_latest_data(searched_cat,
+                dict(
+                    chunks={'time': -1, 'lev':-1}
+                ),
+                variable = "agessc",
+                ensemble = ensemble,
+                frequency = "mon",
+            )
+            print("\nagessc_datadask: ", agessc_datadask)
+            print("Slicing agessc for the time period")
+            agessc_datadask_sel = agessc_datadask.sel(time=slice(start_time, end_time))
+            print("Averaging agessc")
+            agessc = agessc_datadask_sel["agessc"].weighted(agessc_datadask_sel.time.dt.days_in_month).mean(dim="time")
+            print("\nagessc: ", agessc)
+            print("Saving agessc to: ", f'{outputdir}/agessc.nc')
+            agessc.to_netcdf(f'{outputdir}/agessc.nc', compute=True)
+        except Exception:
+            print(f'Error processing {model} {ensemble} agessc')
+            print(traceback.format_exc())
 
 
 

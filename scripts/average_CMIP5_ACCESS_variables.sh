@@ -2,7 +2,7 @@
 
 #PBS -P xv83
 #PBS -N CMIP5_ACCESS_preprocessing
-#PBS -l ncpus=5
+#PBS -l ncpus=28
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB
 #PBS -l walltime=3:00:00
@@ -17,7 +17,7 @@ cd ~/Projects/TMIP/notebooks
 echo "Loading conda/analysis3-24.04 module"
 module use /g/data/hh5/public/modules
 module load conda/analysis3-24.04
-conda init
+
 conda activate conda/analysis3-24.04
 conda info
 
@@ -32,7 +32,7 @@ year_start=1990
 num_years=10
 
 echo "Running transport-state script"
-python scripts/build_average_CMIP5_ACCESS_transport_state_on_Gadi.py $model $experiment $ensemble $year_start $num_years \
+python scripts/average_CMIP5_ACCESS_variables.py $model $experiment $ensemble $year_start $num_years \
 &> output/$model.$experiment.allensembles.$year_start.$num_years.$PBS_JOBID.out
 
 

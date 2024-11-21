@@ -196,7 +196,7 @@ if __name__ == '__main__':
             print("Loading volcello data")
             volcello_datadask = select_latest_data(searched_cat,
                 dict(
-                    # chunks={'i': 60, 'j': 60, 'lev':50}
+                    chunks={'time': -1, 'lev':-1}
                 ),
                 variable_id = "volcello",
                 member_id = member,
@@ -216,7 +216,7 @@ if __name__ == '__main__':
             print("Loading areacello data")
             areacello_datadask = select_latest_data(searched_cat,
                 dict(
-                    # chunks={'i': 60, 'j': 60}
+                    chunks={'time': -1, 'lev':-1}
                 ),
                 variable_id = "areacello",
                 member_id = member,
@@ -236,7 +236,7 @@ if __name__ == '__main__':
             print("Loading umo data")
             umo_datadask = select_latest_data(searched_cat,
                 dict(
-                    # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                    chunks={'time': -1, 'lev':-1}
                 ),
                 variable_id = "umo",
                 member_id = member,
@@ -259,7 +259,7 @@ if __name__ == '__main__':
             print("Loading vmo data")
             vmo_datadask = select_latest_data(searched_cat,
                 dict(
-                    # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                    chunks={'time': -1, 'lev':-1}
                 ),
                 variable_id = "vmo",
                 member_id = member,
@@ -282,7 +282,7 @@ if __name__ == '__main__':
             print("Loading uo data")
             uo_datadask = select_latest_data(searched_cat,
                 dict(
-                    # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                    chunks={'time': -1, 'lev':-1}
                 ),
                 variable_id = "uo",
                 member_id = member,
@@ -305,7 +305,7 @@ if __name__ == '__main__':
             print("Loading vo data")
             vo_datadask = select_latest_data(searched_cat,
                 dict(
-                    # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                    chunks={'time': -1, 'lev':-1}
                 ),
                 variable_id = "vo",
                 member_id = member,
@@ -328,7 +328,7 @@ if __name__ == '__main__':
             print("Loading mlotst data")
             mlotst_datadask = select_latest_data(searched_cat,
                 dict(
-                    # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                    chunks={'time': -1, 'lev':-1}
                 ),
                 variable_id = "mlotst",
                 member_id = member,
@@ -354,7 +354,7 @@ if __name__ == '__main__':
             print("Loading agessc data")
             agessc_datadask = select_latest_data(searched_cat,
                 dict(
-                    # chunks={'i': 60, 'j': 60, 'time': -1, 'lev':50}
+                    chunks={'time': -1, 'lev':-1}
                 ),
                 variable_id = "agessc",
                 member_id = member,

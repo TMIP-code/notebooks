@@ -138,8 +138,8 @@ decade_start = year_start - year_start % 10
 decades = range(decade_start, year_start + num_years, 10)
 
 # Members to loop through
-# members = [1, 3, 4, 5, 6, 7, 8]
-members = [1, 3, 4]
+members = [1, 3, 4, 5, 6, 7, 8]
+# members = [1, 3, 4]
 # members = [5, 6, 7, 8]
 
 
@@ -149,7 +149,7 @@ print("Starting client")
 if __name__ == '__main__':
     client = Client(n_workers=24) #, threads_per_worker=1, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
 
-    for member in members:
+    for member in members[0:1]:
 
         # print ensemble/member
         print(f"\nProcessing {CSIRO_member(member)} as {CMIP6_member(member)}")
@@ -173,7 +173,7 @@ if __name__ == '__main__':
             tx_trans_gm = climatology(tx_trans_gm_sel["tx_trans_gm"], lumpby)
             print("\ntx_trans_gm: ", tx_trans_gm)
             print("      saving to: ", f'{outputdir}/tx_trans_gm.nc')
-            tx_trans_gm.to_netcdf(f'{outputdir}/tx_trans_gm.nc', compute=True)
+            tx_trans_gm.to_dataset(name='tx_trans_gm').to_netcdf(f'{outputdir}/tx_trans_gm.nc', compute=True)
         except Exception:
             print(f'Error processing {model} {CSIRO_member(member)}/{CMIP6_member(member)} tx_trans_gm')
             print(traceback.format_exc())
@@ -189,7 +189,7 @@ if __name__ == '__main__':
             ty_trans_gm = climatology(ty_trans_gm_sel["ty_trans_gm"], lumpby)
             print("\nty_trans_gm: ", ty_trans_gm)
             print("      saving to: ", f'{outputdir}/ty_trans_gm.nc')
-            ty_trans_gm.to_netcdf(f'{outputdir}/ty_trans_gm.nc', compute=True)
+            ty_trans_gm.to_dataset(name='ty_trans_gm').to_netcdf(f'{outputdir}/ty_trans_gm.nc', compute=True)
         except Exception:
             print(f'Error processing {model} {CSIRO_member(member)}/{CMIP6_member(member)} ty_trans_gm')
             print(traceback.format_exc())
@@ -205,7 +205,7 @@ if __name__ == '__main__':
             tx_trans_submeso = climatology(tx_trans_submeso_sel["tx_trans_submeso"], lumpby)
             print("\ntx_trans_submeso: ", tx_trans_submeso)
             print("      saving to: ", f'{outputdir}/tx_trans_submeso.nc')
-            tx_trans_submeso.to_netcdf(f'{outputdir}/tx_trans_submeso.nc', compute=True)
+            tx_trans_submeso.to_dataset(name='tx_trans_submeso').to_netcdf(f'{outputdir}/tx_trans_submeso.nc', compute=True)
         except Exception:
             print(f'Error processing {model} {CSIRO_member(member)}/{CMIP6_member(member)} tx_trans_submeso')
             print(traceback.format_exc())
@@ -221,7 +221,7 @@ if __name__ == '__main__':
             ty_trans_submeso = climatology(ty_trans_submeso_sel["ty_trans_submeso"], lumpby)
             print("\nty_trans_submeso: ", ty_trans_submeso)
             print("      saving to: ", f'{outputdir}/ty_trans_submeso.nc')
-            ty_trans_submeso.to_netcdf(f'{outputdir}/ty_trans_submeso.nc', compute=True)
+            ty_trans_submeso.to_dataset(name='ty_trans_submeso').to_netcdf(f'{outputdir}/ty_trans_submeso.nc', compute=True)
         except Exception:
             print(f'Error processing {model} {CSIRO_member(member)}/{CMIP6_member(member)} ty_trans_submeso')
             print(traceback.format_exc())

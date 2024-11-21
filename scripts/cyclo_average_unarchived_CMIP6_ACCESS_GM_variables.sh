@@ -29,8 +29,8 @@ model=ACCESS-ESM1-5
 experiment=historical
 year_start=1990
 num_years=10
-# lumpby=month
-lumpby=season
+lumpby=month
+# lumpby=season
 
 
 echo "Running transport-state script"
