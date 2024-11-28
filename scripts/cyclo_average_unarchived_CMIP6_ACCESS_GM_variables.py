@@ -138,7 +138,10 @@ decade_start = year_start - year_start % 10
 decades = range(decade_start, year_start + num_years, 10)
 
 # Members to loop through
-members = [1, 3, 4, 5, 6, 7, 8]
+# members = range(1, 41)
+members = range(1, 9)
+# members = range(9, 41)
+# members = [1, 3, 4, 5, 6, 7, 8]
 # members = [1, 3, 4]
 # members = [5, 6, 7, 8]
 
@@ -149,13 +152,13 @@ print("Starting client")
 if __name__ == '__main__':
     client = Client(n_workers=24) #, threads_per_worker=1, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
 
-    for member in members[0:1]:
+    for member in members:
 
         # print ensemble/member
         print(f"\nProcessing {CSIRO_member(member)} as {CMIP6_member(member)}")
 
         # directory to save the data to (as NetCDF)
-        inputdir = f'{gdatadatadir}/{model}/{CSIRO_member(member)}'
+        inputdir = f'{gdatadatadir}/{model}/{experiment}/{CSIRO_member(member)}'
         outputdir = f'{scratchdatadir}/{model}/{experiment}/{CMIP6_member(member)}/{start_time_str}-{end_time_str}/cyclo{lumpby}'
         print("Creating directory: ", outputdir)
         os.makedirs(outputdir, exist_ok=True)

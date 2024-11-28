@@ -112,7 +112,7 @@ if __name__ == '__main__':
         print(f"\nProcessing {CSIRO_member(member)} as {CMIP6_member(member)}")
 
         # directory to save the data to (as NetCDF)
-        inputdir = f'{gdatadatadir}/{model}/{CSIRO_member(member)}'
+        inputdir = f'{gdatadatadir}/{model}/{experiment}/{CSIRO_member(member)}'
         outputdir = f'{scratchdatadir}/{model}/{experiment}/{CMIP6_member(member)}/{start_time_str}-{end_time_str}'
         print("Creating directory: ", outputdir)
         os.makedirs(outputdir, exist_ok=True)

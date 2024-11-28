@@ -2,10 +2,10 @@
 
 #PBS -P xv83
 #PBS -N CMIP6_ACCESS_preprocessing
-#PBS -l ncpus=28
+#PBS -l ncpus=48
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB
-#PBS -l walltime=12:00:00
+#PBS -l walltime=24:00:00
 #PBS -l storage=gdata/xv83+gdata/oi10+gdata/dk92+gdata/hh5+gdata/rr3+gdata/al33+gdata/fs38+gdata/xp65+gdata/p73
 #PBS -l wd
 #PBS -o output/PBS/

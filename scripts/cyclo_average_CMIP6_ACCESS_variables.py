@@ -252,7 +252,7 @@ print("Starting client")
 if __name__ == '__main__':
     client = Client(n_workers=4, threads_per_worker=1)#, threads_per_worker=1, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
 
-    for member in sorted_members[0:1]:
+    for member in sorted_members:
 
         # print ensemble/member
         print(f"\nProcessing member: {member}")
