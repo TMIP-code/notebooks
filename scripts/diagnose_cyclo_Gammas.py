@@ -73,41 +73,6 @@ def CMIP6_member(member):
 
 # Members to loop through
 
-def inputdirfun(member):
-    return f'{scratchdatadir}/{model}/{experiment}/{CMIP6_member(member)}/{start_time_str}-{end_time_str}/cyclo{lumpby}'
-
-def inputfilepathfun(member):
-    return f'{inputdirfun(member)}/ideal_mean_age.nc'
-
-def isvalidmember(member):
-    return os.path.isfile(inputfilepathfun(member))
-
-members = [m for m in range(1, 41) if isvalidmember(m)]
-paths = [inputfilepathfun(m) for m in members]
-members_axis = pd.Index(members, name="members")
-
-
-# function to open all files and combine them
-# TODO Figure out how to do this... !@#$%^&*xarray*&^%$#@!
-def open_my_dataset(paths):
-    ds = xr.open_mfdataset(
-        paths,
-        chunks={'Ti':-1, 'lev':-1}, # TODO these dim names likely won't work for my Gammas
-        concat_dim=members_axis, # TODO these dim names likely won't work for my Gammas
-        compat='override',
-        preprocess=None,
-        engine='netcdf4',
-        data_vars='minimal',
-        coords='minimal',
-        combine='nested',
-        parallel=True,
-        join='outer',
-        attrs_file=None,
-        combine_attrs='override',
-    )
-    return ds
-
-
 
 # Create directory on scratch to save the data
 scratchdatadir = '/scratch/xv83/TMIP/data'
@@ -119,19 +84,59 @@ end_time_str = f'Dec{end_time}'
 
 
 
+def inputdirfun(member):
+    return f'{scratchdatadir}/{model}/{experiment}/{CMIP6_member(member)}/{start_time_str}-{end_time_str}/cyclo{lumpby}'
+
+def inputfilepathfun(member):
+    return f'{inputdirfun(member)}/ideal_mean_age.nc'
+
+def isvalidmember(member):
+    return os.path.isfile(inputfilepathfun(member))
+
+members = [m for m in range(1, 41) if isvalidmember(m)]
+
+# # For debugging only
+# members = members[0:2]
+
+paths = [inputfilepathfun(m) for m in members]
+members_axis = pd.Index(members, name="member")
+
+
+# function to open all files and combine them
+# TODO Figure out how to do this... !@#$%^&*xarray*&^%$#@!
+def open_my_dataset(paths):
+    ds = xr.open_mfdataset(
+        paths,
+        chunks={'Ti':-1, 'lev':-1}, # TODO these dim names likely won't work for my Gammas
+        concat_dim=[members_axis], # TODO these dim names likely won't work for my Gammas
+        compat='override',
+        preprocess=None,
+        engine='netcdf4',
+        # data_vars='minimal', # <- cannot have this option otherwise only one member is loaded it seems
+        coords='minimal',
+        combine='nested',
+        parallel=True,
+        join='outer',
+        attrs_file=None,
+        combine_attrs='override',
+    )
+    return ds
+
+
+
+
 outputdir = f'{scratchdatadir}/{model}/{experiment}/all_members/{start_time_str}-{end_time_str}/cyclo{lumpby}'
 print("Creating directory: ", outputdir)
 os.makedirs(outputdir, exist_ok=True)
-print("  averaging data from: ", inputdir)
 print("  to be saved in: ", outputdir)
 
 print("Starting client")
 
 # This `if` statement is required in scripts (not required in Jupyter)
 if __name__ == '__main__':
-    client = Client(n_workers=44, threads_per_worker=1)
+    client = Client(n_workers=40, threads_per_worker=1)
 
-    age_ds = open_my_dataset(paths[0:2])
+    age_ds = open_my_dataset(paths)
     print("\nage_ds: ", age_ds)
     age = age_ds.age
     print("\nage: ", age)
