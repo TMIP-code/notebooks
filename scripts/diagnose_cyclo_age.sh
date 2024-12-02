@@ -34,7 +34,7 @@ lumpby=month
 
 
 echo "Running transport-state script"
-python scripts/diagnose_cyclo_Gammas.py $model $experiment $year_start $num_years $lumpby \
-&> output/cyclo.diagnose_cyclo_Gammas.$PBS_JOBID.$model.$experiment.$year_start.$num_years.out
+python scripts/diagnose_cyclo_age.py $model $experiment $year_start $num_years $lumpby \
+&> output/cyclo.diagnose_cyclo_age.$PBS_JOBID.$model.$experiment.$year_start.$num_years.out
 
 
