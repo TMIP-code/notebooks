@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #PBS -P xv83
-#PBS -N diagnoseGammas
+#PBS -N diagnose_reemerg
 #PBS -l ncpus=48
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB

@@ -26,8 +26,11 @@ module load python3/3.12.1
 # CHANGE HERE the model, experiment, ensemble, etc.
 model=ACCESS-ESM1-5
 # model=ACCESS-CM2
-experiment=historical
-year_start=1990
+# experiment=historical
+experiment=ssp370
+# year_start=1990
+# year_start=1850
+year_start=2090
 num_years=10
 lumpby=month
 # lumpby=season
@@ -35,6 +38,6 @@ lumpby=month
 
 echo "Running transport-state script"
 python scripts/cyclo_average_unarchived_CMIP6_ACCESS_GM_variables.py $model $experiment $year_start $num_years $lumpby \
-&> output/cyclo.$PBS_JOBID.average.$model.$experiment.datafromTilo.$year_start.$num_years.out
+&> output/cyclo_average_unarchived_CMIP6_ACCESS_GM_variables.$model.$experiment.$year_start.$num_years.$PBS_JOBID.out
 
 

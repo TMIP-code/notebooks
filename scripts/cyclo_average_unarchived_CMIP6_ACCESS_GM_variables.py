@@ -68,8 +68,15 @@ def time_window_strings(year_start, num_years):
 def CMIP6_member(member):
     return f'r{member}i1p1f1'
 
-def CSIRO_member(member):
-    return f'HI-{member+4:02d}' # note the +4!
+def CSIRO_experiment(experiment):
+    if experiment == 'historical':
+        return 'HI'
+    else:
+        return 'SSP-370'
+
+def CSIRO_member(experiment, member):
+    return f'{CSIRO_experiment(experiment)}-{member+4:02d}' # note the +4!
+
 
 def open_my_dataset(paths):
     ds = xr.open_mfdataset(
@@ -138,8 +145,8 @@ decade_start = year_start - year_start % 10
 decades = range(decade_start, year_start + num_years, 10)
 
 # Members to loop through
-# members = range(1, 41)
-members = range(1, 9)
+members = range(1, 41)
+# members = range(1, 9)
 # members = range(9, 41)
 # members = [1, 3, 4, 5, 6, 7, 8]
 # members = [1, 3, 4]
@@ -155,10 +162,10 @@ if __name__ == '__main__':
     for member in members:
 
         # print ensemble/member
-        print(f"\nProcessing {CSIRO_member(member)} as {CMIP6_member(member)}")
+        print(f"\nProcessing {CSIRO_member(experiment, member)} as {CMIP6_member(member)}")
 
         # directory to save the data to (as NetCDF)
-        inputdir = f'{gdatadatadir}/{model}/{experiment}/{CSIRO_member(member)}'
+        inputdir = f'{gdatadatadir}/{model}/{experiment}/{CSIRO_member(experiment, member)}'
         outputdir = f'{scratchdatadir}/{model}/{experiment}/{CMIP6_member(member)}/{start_time_str}-{end_time_str}/cyclo{lumpby}'
         print("Creating directory: ", outputdir)
         os.makedirs(outputdir, exist_ok=True)
@@ -178,7 +185,7 @@ if __name__ == '__main__':
             print("      saving to: ", f'{outputdir}/tx_trans_gm.nc')
             tx_trans_gm.to_dataset(name='tx_trans_gm').to_netcdf(f'{outputdir}/tx_trans_gm.nc', compute=True)
         except Exception:
-            print(f'Error processing {model} {CSIRO_member(member)}/{CMIP6_member(member)} tx_trans_gm')
+            print(f'Error processing {model} {CSIRO_member(experiment, member)}/{CMIP6_member(member)} tx_trans_gm')
             print(traceback.format_exc())
 
         # ty_trans_gm
@@ -194,7 +201,7 @@ if __name__ == '__main__':
             print("      saving to: ", f'{outputdir}/ty_trans_gm.nc')
             ty_trans_gm.to_dataset(name='ty_trans_gm').to_netcdf(f'{outputdir}/ty_trans_gm.nc', compute=True)
         except Exception:
-            print(f'Error processing {model} {CSIRO_member(member)}/{CMIP6_member(member)} ty_trans_gm')
+            print(f'Error processing {model} {CSIRO_member(experiment, member)}/{CMIP6_member(member)} ty_trans_gm')
             print(traceback.format_exc())
 
         # tx_trans_submeso
@@ -210,7 +217,7 @@ if __name__ == '__main__':
             print("      saving to: ", f'{outputdir}/tx_trans_submeso.nc')
             tx_trans_submeso.to_dataset(name='tx_trans_submeso').to_netcdf(f'{outputdir}/tx_trans_submeso.nc', compute=True)
         except Exception:
-            print(f'Error processing {model} {CSIRO_member(member)}/{CMIP6_member(member)} tx_trans_submeso')
+            print(f'Error processing {model} {CSIRO_member(experiment, member)}/{CMIP6_member(member)} tx_trans_submeso')
             print(traceback.format_exc())
 
         # ty_trans_submeso
@@ -226,7 +233,7 @@ if __name__ == '__main__':
             print("      saving to: ", f'{outputdir}/ty_trans_submeso.nc')
             ty_trans_submeso.to_dataset(name='ty_trans_submeso').to_netcdf(f'{outputdir}/ty_trans_submeso.nc', compute=True)
         except Exception:
-            print(f'Error processing {model} {CSIRO_member(member)}/{CMIP6_member(member)} ty_trans_submeso')
+            print(f'Error processing {model} {CSIRO_member(experiment, member)}/{CMIP6_member(member)} ty_trans_submeso')
             print(traceback.format_exc())
 
     client.close()

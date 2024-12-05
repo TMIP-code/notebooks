@@ -141,21 +141,25 @@ if __name__ == '__main__':
     adjointage = adjointage_ds.adjointage
     print("\nadjointage: ", adjointage)
 
-    adjointage_mean = adjointage.mean(dim = ["Ti", "member"])
-    print("\nadjointage_mean: ", adjointage_mean)
-    adjointage_mean.to_dataset(name = 'adjointage_mean').to_netcdf(f'{outputdir}/adjointage_mean.nc', compute = True)
+    adjointage_timemean = adjointage.mean(dim = ["Ti"])
+    print("\nadjointage_timemean: ", adjointage_timemean)
+    adjointage_timemean.to_dataset(name = 'adjointage_timemean').to_netcdf(f'{outputdir}/adjointage_timemean.nc', compute = True)
 
-    adjointage_std = adjointage.std(dim = ["Ti", "member"])
-    print("\nadjointage_std: ", adjointage_std)
-    adjointage_std.to_dataset(name = 'adjointage_std').to_netcdf(f'{outputdir}/adjointage_std.nc', compute = True)
+    adjointage_ensemblemean = adjointage_timemean.mean(dim = ["member"])
+    print("\nadjointage_ensemblemean: ", adjointage_ensemblemean)
+    adjointage_ensemblemean.to_dataset(name = 'adjointage_ensemblemean').to_netcdf(f'{outputdir}/adjointage_ensemblemean.nc', compute = True)
 
-    adjointage_max = adjointage.max(dim = ["Ti", "member"])
-    print("\nadjointage_max: ", adjointage_max)
-    adjointage_max.to_dataset(name = 'adjointage_max').to_netcdf(f'{outputdir}/adjointage_max.nc', compute = True)
+    adjointage_ensemblestd = adjointage_timemean.std(dim = ["member"])
+    print("\nadjointage_ensemblestd: ", adjointage_ensemblestd)
+    adjointage_ensemblestd.to_dataset(name = 'adjointage_ensemblestd').to_netcdf(f'{outputdir}/adjointage_ensemblestd.nc', compute = True)
 
-    adjointage_min = adjointage.min(dim = ["Ti", "member"])
-    print("\nadjointage_min: ", adjointage_min)
-    adjointage_min.to_dataset(name = 'adjointage_min').to_netcdf(f'{outputdir}/adjointage_min.nc', compute = True)
+    adjointage_ensemblemax = adjointage_timemean.max(dim = ["member"])
+    print("\nadjointage_ensemblemax: ", adjointage_ensemblemax)
+    adjointage_ensemblemax.to_dataset(name = 'adjointage_ensemblemax').to_netcdf(f'{outputdir}/adjointage_ensemblemax.nc', compute = True)
+
+    adjointage_ensemblemin = adjointage_timemean.min(dim = ["member"])
+    print("\nadjointage_ensemblemin: ", adjointage_ensemblemin)
+    adjointage_ensemblemin.to_dataset(name = 'adjointage_ensemblemin').to_netcdf(f'{outputdir}/adjointage_ensemblemin.nc', compute = True)
 
 
 

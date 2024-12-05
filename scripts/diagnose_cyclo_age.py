@@ -141,21 +141,25 @@ if __name__ == '__main__':
     age = age_ds.age
     print("\nage: ", age)
 
-    age_mean = age.mean(dim = ["Ti", "member"])
-    print("\nage_mean: ", age_mean)
-    age_mean.to_dataset(name = 'age_mean').to_netcdf(f'{outputdir}/age_mean.nc', compute = True)
+    age_timemean = age.mean(dim = ["Ti"])
+    print("\nage_timemean: ", age_timemean)
+    age_timemean.to_dataset(name = 'age_timemean').to_netcdf(f'{outputdir}/age_timemean.nc', compute = True)
 
-    age_std = age.std(dim = ["Ti", "member"])
-    print("\nage_std: ", age_std)
-    age_std.to_dataset(name = 'age_std').to_netcdf(f'{outputdir}/age_std.nc', compute = True)
+    age_ensemblemean = age_timemean.mean(dim = ["member"])
+    print("\nage_ensemblemean: ", age_ensemblemean)
+    age_ensemblemean.to_dataset(name = 'age_ensemblemean').to_netcdf(f'{outputdir}/age_ensemblemean.nc', compute = True)
 
-    age_max = age.max(dim = ["Ti", "member"])
-    print("\nage_max: ", age_max)
-    age_max.to_dataset(name = 'age_max').to_netcdf(f'{outputdir}/age_max.nc', compute = True)
+    age_ensemblestd = age_timemean.std(dim = ["member"])
+    print("\nage_ensemblestd: ", age_ensemblestd)
+    age_ensemblestd.to_dataset(name = 'age_ensemblestd').to_netcdf(f'{outputdir}/age_ensemblestd.nc', compute = True)
 
-    age_min = age.min(dim = ["Ti", "member"])
-    print("\nage_min: ", age_min)
-    age_min.to_dataset(name = 'age_min').to_netcdf(f'{outputdir}/age_min.nc', compute = True)
+    age_ensemblemax = age_timemean.max(dim = ["member"])
+    print("\nage_ensemblemax: ", age_ensemblemax)
+    age_ensemblemax.to_dataset(name = 'age_ensemblemax').to_netcdf(f'{outputdir}/age_ensemblemax.nc', compute = True)
+
+    age_ensemblemin = age_timemean.min(dim = ["member"])
+    print("\nage_ensemblemin: ", age_ensemblemin)
+    age_ensemblemin.to_dataset(name = 'age_ensemblemin').to_netcdf(f'{outputdir}/age_ensemblemin.nc', compute = True)
 
 
 
