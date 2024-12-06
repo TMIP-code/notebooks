@@ -3,7 +3,7 @@
 #PBS -P xv83
 #PBS -N average_TiloZ_data
 #PBS -l ncpus=28
-#PBS -q normalbw
+#PBS -q normal
 #PBS -l mem=80GB
 #PBS -l jobfs=4GB
 #PBS -l walltime=12:00:00
