@@ -27,7 +27,8 @@ Nvars = length(vars)
 df2 = @chain df begin
     # @groupby(:decade)
     # @combine(:count => sum(:isfile))
-    @by(:decade, :done = 100 * sum(:isfile) / (Nmembers * Nvars))
+    # @by(:decade, :done = 100 * sum(:isfile) / (Nmembers * Nvars))
+    @by([:decade, :variable], :done = 100 * sum(:isfile) / Nmembers)
 end
 # df2 = @chain df begin
 #     # @subset(:isfile)
@@ -41,4 +42,3 @@ end
 #     # @orderby(:CSIRO_member, :decade, :variable)
 # end
 show(df2, allrows = true)
-exit()

@@ -27,14 +27,15 @@ module load python3/3.12.1
 model=ACCESS-ESM1-5
 # model=ACCESS-CM2
 # experiment=historical
-experiment=ssp370
-ensemble=r1i1p1f1 # <- note that this is not used in the script
-# year_start=1990
 # year_start=1850
+# year_start=1990
+experiment=ssp370
+# year_start=2030
 year_start=2090
 num_years=10
 lumpby=month
 # lumpby=season
+ensemble=r1i1p1f1 # <- note that this is not used in the script
 
 echo "Running transport-state script"
 python scripts/cyclo_average_CMIP6_ACCESS_variables.py $model $experiment $ensemble $year_start $num_years $lumpby \
