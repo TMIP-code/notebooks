@@ -27,6 +27,7 @@ experiment="historical"
 ensemble="r1i1p1f1" # <- note that this is not used in the script
 year_start=1990
 num_years=10
+lumpby="month"
 
 
 # Model etc. defined from script input
@@ -107,7 +108,6 @@ def select_latest_cat(cat, **kwargs):
     # if dataframe is empty, error
     if selectedcat.df.empty:
         raise ValueError(f"No data found for {kwargs}")
-
     latestselectedcat = selectedcat.search(version=find_latest_version(selectedcat))
     return latestselectedcat
 
@@ -131,9 +131,7 @@ def season_climatology(ds):
     # Make a DataArray with the number of days in each month, size = len(time)
     month_length = ds.time.dt.days_in_month
     # Calculate the weights by grouping by 'time.season'
-    weights = (
-        month_length.groupby("time.season") / month_length.groupby("time.season").sum()
-    )
+    weights = month_length.groupby("time.season") / month_length.groupby("time.season").sum()
     # Test that the sum of the weights for each season is 1.0
     np.testing.assert_allclose(weights.groupby("time.season").sum().values, np.ones(4))
     # Calculate the weighted average
@@ -143,13 +141,16 @@ def month_climatology(ds):
     # Make a DataArray with the number of days in each month, size = len(time)
     month_length = ds.time.dt.days_in_month
     # Calculate the weights by grouping by 'time.season'
-    weights = (
-        month_length.groupby("time.month") / month_length.groupby("time.month").sum()
-    )
+    weights = month_length.groupby("time.month") / month_length.groupby("time.month").sum()
     # Test that the sum of the weights for each month is 1.0
     np.testing.assert_allclose(weights.groupby("time.month").sum().values, np.ones(12))
     # Calculate the weighted average
-    return (ds * weights).groupby("time.month").sum(dim="time")
+    ds_out = (ds * weights).groupby("time.month").sum(dim="time")
+    # Keep track of mean number of days per month
+    mean_days_in_month = month_length.groupby("time.month").mean()
+    # And assign it to new coordinate
+    ds_out = ds_out.assign_coords(mean_days_in_month=('month', mean_days_in_month.data))
+    return ds_out
 
 def climatology(ds, lumpby):
     if lumpby == "month":
