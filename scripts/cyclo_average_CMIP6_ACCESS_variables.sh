@@ -2,7 +2,8 @@
 
 #PBS -P xv83
 #PBS -N CMIP6_ACCESS_preprocessing
-#PBS -l ncpus=48
+#PBS -l ncpus=28
+#PBS -q normalbw
 #PBS -l mem=180GB
 #PBS -l jobfs=4GB
 #PBS -l walltime=24:00:00
