@@ -146,12 +146,13 @@ decade_start = year_start - year_start % 10
 decades = range(decade_start, year_start + num_years, 10)
 
 # Members to loop through
-members = range(1, 41)
+# members = range(1, 41)
 # members = range(1, 9)
 # members = range(9, 41)
 # members = [1, 3, 4, 5, 6, 7, 8]
 # members = [1, 3, 4]
 # members = [5, 6, 7, 8]
+members = [39, 40]
 
 
 print("Starting client")

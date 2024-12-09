@@ -28,11 +28,11 @@ model=ACCESS-ESM1-5
 # model=ACCESS-CM2
 
 # experiment=historical
-# members=("HI-06","HI-33","HI-34","HI-35","HI-36")
+# members=("HI-43","HI-44")
 # decade_start=1850
 # decade_end=2020
 experiment=ssp370
-members=("SSP-370-31","SSP-370-32","SSP-370-33","SSP-370-34","SSP-370-35","SSP-370-36","SSP-370-37","SSP-370-38","SSP-370-39","SSP-370-40","SSP-370-41","SSP-370-42","SSP-370-43","SSP-370-44")
+members=("SSP-370-43","SSP-370-44")
 decade_start=2010
 decade_end=2100
 
