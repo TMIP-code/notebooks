@@ -45,6 +45,6 @@ decade_end=2100
 
 echo "Running transport-state script"
 python scripts/check_archive_unarchived_CMIP6_ACCESS_GM_files.py $model $experiment $members $decade_start $decade_end \
-&> output/$PBS_JOBID.$model.monthly.checkarchiveddatavsTilos.out
+&> output/check_archive_unarchived_CMIP6_ACCESS_GM_files.$PBS_JOBID.out
 
 
