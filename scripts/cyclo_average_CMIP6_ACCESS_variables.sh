@@ -27,12 +27,12 @@ module load python3/3.12.1
 # CHANGE HERE the model, experiment, ensemble, etc.
 model=ACCESS-ESM1-5
 # model=ACCESS-CM2
-experiment=historical
-year_start=1850
+# experiment=historical
+# year_start=1850
 # year_start=1990
-# experiment=ssp370
+experiment=ssp370
 # year_start=2030
-# year_start=2090
+year_start=2090
 num_years=10
 lumpby=month
 # lumpby=season
