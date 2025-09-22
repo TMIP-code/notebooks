@@ -22,8 +22,9 @@
 import sys
 
 # interactive use only
-model="ACCESS-ESM1-5"
-experiment="historical"
+# model="ACCESS-ESM1-5"
+model="ACCESS-OM2"
+experiment="omip2"
 ensemble="r1i1p1f1" # <- note that this is not used in the script
 year_start=1990
 num_years=10
@@ -34,7 +35,7 @@ model = sys.argv[1]
 print("Model: ", model, " (type: ", type(model), ")")
 experiment = sys.argv[2]
 print("Experiment: ", experiment, " (type: ", type(experiment), ")")
-ensemble = sys.argv[3]
+ensemble = sys.argv[3] # <- not used since I now loop over all members
 print("Ensemble member: ", ensemble, " (type: ", type(ensemble), ")")
 year_start = int(sys.argv[4])
 num_years = int(sys.argv[5])
@@ -45,6 +46,7 @@ print("Time window: ", year_start, " to ", year_start + num_years - 1)
 # Ignore warnings
 from os import environ
 environ["PYTHONWARNINGS"] = "ignore"
+PROJECT = environ["PROJECT"]
 
 # Import makedirs to create directories where I write new files
 from os import makedirs
@@ -79,9 +81,9 @@ def time_window_strings(year_start, num_years):
     return strings for start_time and end_time
     """
     # start_time is first second of year_start
-    start_time = f'{year_start}'
+    start_time = f'{year_start:04d}'
     # end_time is last second of last_year
-    end_time = f'{year_start + num_years - 1}'
+    end_time = f'{year_start + num_years - 1:04d}'
     # Return the weighted average
     return start_time, end_time
 
@@ -201,7 +203,7 @@ print("\n".join(sorted_members))
 
 
 # Create directory on scratch to save the data
-datadir = '/scratch/xv83/TMIP/data'
+datadir = f'/scratch/{PROJECT}/TMIP/data'
 start_time, end_time = time_window_strings(year_start, num_years)
 start_time_str = f'Jan{start_time}'
 end_time_str = f'Dec{end_time}'
@@ -214,7 +216,7 @@ print("Starting client")
 
 # This `if` statement is required in scripts (not required in Jupyter)
 if __name__ == '__main__':
-    client = Client(n_workers=4, threads_per_worker=1) #, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
+    client = Client(n_workers=24, threads_per_worker=1) #, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
 
     for member in sorted_members:
 

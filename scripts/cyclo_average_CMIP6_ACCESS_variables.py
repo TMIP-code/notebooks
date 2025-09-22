@@ -22,8 +22,9 @@
 import sys
 
 # interactive use only
-model="ACCESS-ESM1-5"
-experiment="historical"
+# model="ACCESS-ESM1-5"
+model="ACCESS-OM2"
+experiment="omip2"
 ensemble="r1i1p1f1" # <- note that this is not used in the script
 year_start=1990
 num_years=10
@@ -48,6 +49,7 @@ print("Lumping by", lumpby)
 # Ignore warnings
 from os import environ
 environ["PYTHONWARNINGS"] = "ignore"
+PROJECT = environ["PROJECT"]
 
 # Import makedirs to create directories where I write new files
 from os import makedirs
@@ -85,9 +87,9 @@ def time_window_strings(year_start, num_years):
     return strings for start_time and end_time
     """
     # start_time is first second of year_start
-    start_time = f'{year_start}'
+    start_time = f'{year_start:04d}'
     # end_time is last second of last_year
-    end_time = f'{year_start + num_years - 1}'
+    end_time = f'{year_start + num_years - 1:04d}'
     # Return the weighted average
     return start_time, end_time
 
@@ -108,6 +110,7 @@ def select_latest_cat(cat, **kwargs):
     # if dataframe is empty, error
     if selectedcat.df.empty:
         raise ValueError(f"No data found for {kwargs}")
+
     latestselectedcat = selectedcat.search(version=find_latest_version(selectedcat))
     return latestselectedcat
 
@@ -238,7 +241,7 @@ print("\n".join(sorted_members))
 
 
 # Create directory on scratch to save the data
-datadir = '/scratch/xv83/TMIP/data'
+datadir = f'/scratch/{PROJECT}/TMIP/data'
 start_time, end_time = time_window_strings(year_start, num_years)
 start_time_str = f'Jan{start_time}'
 end_time_str = f'Dec{end_time}'

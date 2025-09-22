@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#PBS -P xv83
+#PBS -P y99
 #PBS -N CMIP6_ACCESS_preprocessing
 #PBS -l ncpus=28
 #PBS -l mem=180GB
@@ -24,11 +24,15 @@ echo "Loading python3/3.12.1"
 module load python3/3.12.1
 
 # CHANGE HERE the model, experiment, ensemble, etc.
-model=ACCESS-ESM1-5
+# model=ACCESS-ESM1-5
 # model=ACCESS-CM2
-experiment=historical
+# model=ACCESS-OM2
+model=ACCESS-OM2-025
+# experiment=historical
+experiment=omip2
 ensemble=r1i1p1f1 # <- note that this is not used in the script
-year_start=1850
+# year_start=1850
+year_start=200
 num_years=10
 
 echo "Running transport-state script"
