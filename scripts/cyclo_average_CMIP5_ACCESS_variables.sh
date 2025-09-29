@@ -15,7 +15,7 @@ echo "Going into TMIP notebooks directory"
 cd ~/Projects/TMIP/notebooks
 
 echo "Loading conda/analysis3-24.04 module"
-module use /g/data/hh5/public/modules
+module use /g/data/xp65/public/modules
 module load conda/analysis3-24.04
 
 conda activate conda/analysis3-24.04

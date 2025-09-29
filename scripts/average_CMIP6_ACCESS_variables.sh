@@ -15,7 +15,7 @@ echo "Going into TMIP notebooks directory"
 cd ~/Projects/TMIP/notebooks
 
 echo "Loading conda/analysis3-24.04 module"
-module use /g/data/hh5/public/modules
+module use /g/data/xp65/public/modules
 module load conda/analysis3-24.04
 conda activate conda/analysis3-24.04
 conda info
@@ -28,6 +28,7 @@ module load python3/3.12.1
 # model=ACCESS-CM2
 # model=ACCESS-OM2
 model=ACCESS-OM2-025
+# model=ACCESS-OM2-01 # Cannot work: No ACCESS-OM2-01 data in CMIP6!
 # experiment=historical
 experiment=omip2
 ensemble=r1i1p1f1 # <- note that this is not used in the script
