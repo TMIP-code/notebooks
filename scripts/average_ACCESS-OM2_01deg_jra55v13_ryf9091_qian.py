@@ -8,16 +8,6 @@ subcatalog = "01deg_jra55v13_ryf9091_qian_wthmp"
 year_start = 2150 # for this experiment this is the start of the last decade
 num_years = 10
 
-
-# Model etc. defined from script input
-model = sys.argv[1]
-print("Model: ", model, " (type: ", type(model), ")")
-subcatalog = sys.argv[2]
-print("Subcatalog: ", subcatalog, " (type: ", type(subcatalog), ")")
-year_start = int(sys.argv[3])
-num_years = int(sys.argv[4])
-print("Time window: ", year_start, " to ", year_start + num_years - 1)
-
 # 1. Load packages
 
 # Ignore warnings
@@ -91,6 +81,16 @@ searched_cat = cat.search(variable = ["tx_trans", "ty_trans", "mld", "area_t", "
 print(searched_cat)
 
 
+# Quick word on chunking of these for 01deg_jra55v13_ryf9091_qian data:
+# name       time    x      y      z   frequency
+# ───────────────────────────────────────────────
+# totalsize          3600   2700  75
+# area_t              900    675       fixed
+# tx_trans   1        400    300  7    year
+# ty_trans   1        400    300  7    year
+# dzt        1        400    300  7    month
+# mld        1        900    675       month
+
 
 # Create directory on scratch to save the data
 datadir = f'/scratch/{PROJECT}/TMIP/data'
@@ -106,7 +106,7 @@ print("Starting client")
 
 # This `if` statement is required in scripts (not required in Jupyter)
 if __name__ == '__main__':
-    client = Client(n_workers=24, threads_per_worker=1) #, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
+    client = Client(n_workers=48, threads_per_worker=1) #, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
 
 
     # directory to save the data to (as NetCDF)
@@ -114,22 +114,6 @@ if __name__ == '__main__':
     print("Creating directory: ", outputdir)
     makedirs(outputdir, exist_ok=True)
 
-    # dzt
-    try:
-        print("Loading dzt data")
-        dzt_datadask = select_data(searched_cat,
-            dict(
-                chunks={'time': -1, 'lev':-1}
-            ),
-            variable = "dzt",
-        )
-        print("\ndzt_datadask: ", dzt_datadask)
-        dzt_file = f'{outputdir}/dzt.nc'
-        print("Saving dzt to: ", dzt_file)
-        dzt_datadask.to_netcdf(dzt_file, compute=True)
-    except Exception:
-        print(f'Error processing {model} dzt')
-        print(traceback.format_exc())
 
 
     # area_t
@@ -137,9 +121,11 @@ if __name__ == '__main__':
         print("Loading area_t data")
         area_t_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'lev':-1}
+                chunks={'xt_ocean':900, 'yt_ocean':675}
+
             ),
             variable = "area_t",
+            frequency = "fx",
         )
         print("\narea_t_datadask: ", area_t_datadask)
         print("Slicing area_t for the time period")
@@ -159,15 +145,16 @@ if __name__ == '__main__':
         print("Loading tx_trans data")
         tx_trans_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'lev':-1}
+                chunks={'time': -1, 'xt_ocean':400, 'yt_ocean':300, 'lev':7}
             ),
             variable = "tx_trans",
+            frequency = "yr",
         )
         print("\ntx_trans_datadask: ", tx_trans_datadask)
         print("Slicing tx_trans for the time period")
         tx_trans_datadask_sel = tx_trans_datadask.sel(time=slice(start_time, end_time))
         print("Averaging tx_trans")
-        tx_trans = tx_trans_datadask_sel["tx_trans"].weighted(tx_trans_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        tx_trans = tx_trans_datadask_sel["tx_trans"].weighted(tx_trans_datadask_sel.time.dt.days_in_year).mean(dim="time")
         print("\ntx_trans: ", tx_trans)
         print("Saving tx_trans to: ", f'{outputdir}/tx_trans.nc')
         tx_trans.to_netcdf(f'{outputdir}/tx_trans.nc', compute=True)
@@ -180,16 +167,16 @@ if __name__ == '__main__':
         print("Loading ty_trans data")
         ty_trans_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'lev':-1}
+                chunks={'time': -1, 'xt_ocean':400, 'yt_ocean':300, 'lev':7}
             ),
             variable = "ty_trans",
-            # frequency = "mon",
+            frequency = "yr",
         )
         print("\nty_trans_datadask: ", ty_trans_datadask)
         print("Slicing ty_trans for the time period")
         ty_trans_datadask_sel = ty_trans_datadask.sel(time=slice(start_time, end_time))
         print("Averaging ty_trans")
-        ty_trans = ty_trans_datadask_sel["ty_trans"].weighted(ty_trans_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        ty_trans = ty_trans_datadask_sel["ty_trans"].weighted(ty_trans_datadask_sel.time.dt.days_in_year).mean(dim="time")
         print("\nty_trans: ", ty_trans)
         print("Saving ty_trans to: ", f'{outputdir}/ty_trans.nc')
         ty_trans.to_netcdf(f'{outputdir}/ty_trans.nc', compute=True)
@@ -203,10 +190,10 @@ if __name__ == '__main__':
         print("Loading mld data")
         mld_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'lev':-1}
+                chunks={'time': -1, 'xt_ocean':900, 'yt_ocean':675}
             ),
             variable = "mld",
-            # frequency = "mon",
+            frequency = "mon",
         )
         print("\nmld_datadask: ", mld_datadask)
         print("Slicing mld for the time period")
@@ -225,6 +212,25 @@ if __name__ == '__main__':
     except Exception:
         print(f'Error processing {model} mld')
         print(traceback.format_exc())
+
+    # dzt
+    try:
+        print("Loading dzt data")
+        dzt_datadask = select_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'xt_ocean':400, 'yt_ocean':300, 'lev':7}
+            ),
+            variable = "dzt",
+            frequency = "mon",
+        )
+        print("\ndzt_datadask: ", dzt_datadask)
+        dzt_file = f'{outputdir}/dzt.nc'
+        print("Saving dzt to: ", dzt_file)
+        dzt_datadask.to_netcdf(dzt_file, compute=True)
+    except Exception:
+        print(f'Error processing {model} dzt')
+        print(traceback.format_exc())
+
 
 
     client.close()
