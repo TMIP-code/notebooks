@@ -14,26 +14,27 @@
 echo "Going into TMIP notebooks directory"
 cd ~/Projects/TMIP/notebooks
 
-echo "Loading conda/analysis3-24.04 module"
+echo "Loading conda/analysis3 module"
 module use /g/data/xp65/public/modules
-module load conda/analysis3-24.04
-conda activate conda/analysis3-24.04
+module load conda/analysis3
+conda activate conda/analysis3
 conda info
 
 echo "Loading python3/3.12.1"
 module load python3/3.12.1
 
 # CHANGE HERE the model, experiment, ensemble, etc.
-# model=ACCESS-ESM1-5
+model=ACCESS-ESM1-5
 # model=ACCESS-CM2
 # model=ACCESS-OM2
-model=ACCESS-OM2-025
+# model=ACCESS-OM2-025
 # model=ACCESS-OM2-01 # Cannot work: No ACCESS-OM2-01 data in CMIP6!
-# experiment=historical
-experiment=omip2
+experiment=historical
+# experiment=omip2
 ensemble=r1i1p1f1 # <- note that this is not used in the script
 # year_start=1850
-year_start=200
+# year_start=200
+year_start=1990
 num_years=10
 
 echo "Running transport-state script"

@@ -35,8 +35,8 @@ model = sys.argv[1]
 print("Model: ", model, " (type: ", type(model), ")")
 experiment = sys.argv[2]
 print("Experiment: ", experiment, " (type: ", type(experiment), ")")
-ensemble = sys.argv[3] # <- not used since I now loop over all members
-print("Ensemble member: ", ensemble, " (type: ", type(ensemble), ")")
+member = sys.argv[3] # <- not used since I now loop over all members
+print("Ensemble member: ", member, " (type: ", type(member), ")")
 year_start = int(sys.argv[4])
 num_years = int(sys.argv[5])
 print("Time window: ", year_start, " to ", year_start + num_years - 1)
@@ -218,245 +218,245 @@ print("Starting client")
 if __name__ == '__main__':
     client = Client(n_workers=24, threads_per_worker=1) #, memory_limit='16GB') # Note: with 1thread/worker cannot plot thetao. Maybe I need to understand why?
 
-    for member in sorted_members:
+    # for member in sorted_members:
 
-        # print ensemble/member
-        print(f"\nProcessing member: {member}")
+    # print ensemble/member
+    print(f"\nProcessing member: {member}")
 
-        # directory to save the data to (as NetCDF)
-        outputdir = f'{datadir}/{model}/{experiment}/{member}/{start_time_str}-{end_time_str}'
-        print("Creating directory: ", outputdir)
-        makedirs(outputdir, exist_ok=True)
+    # directory to save the data to (as NetCDF)
+    outputdir = f'{datadir}/{model}/{experiment}/{member}/{start_time_str}-{end_time_str}'
+    print("Creating directory: ", outputdir)
+    makedirs(outputdir, exist_ok=True)
 
-        # volcello
-        try:
-            print("Loading volcello data")
-            volcello_datadask = select_latest_data(searched_cat,
-                dict(
-                    chunks={'time': -1, 'lev':-1}
-                ),
-                variable_id = "volcello",
-                member_id = member,
-                table_id = "Ofx",
-            )
-            print("\nvolcello_datadask: ", volcello_datadask)
-            volcello_file = f'{outputdir}/volcello.nc'
-            print("Saving volcello to: ", volcello_file)
-            volcello_datadask.to_netcdf(volcello_file, compute=True)
-        except Exception:
-            print(f'Error processing {model} {member} volcello')
-            print(traceback.format_exc())
-
-
-        # areacello
-        try:
-            print("Loading areacello data")
-            areacello_datadask = select_latest_data(searched_cat,
-                dict(
-                    chunks={'time': -1, 'lev':-1}
-                ),
-                variable_id = "areacello",
-                member_id = member,
-                table_id = "Ofx",
-            )
-            print("\nareacello_datadask: ", areacello_datadask)
-            areacello_file = f'{outputdir}/areacello.nc'
-            print("Saving areacello to: ", areacello_file)
-            areacello_datadask.to_netcdf(areacello_file, compute=True)
-        except Exception:
-            print(f'Error processing {model} {member} areacello')
-            print(traceback.format_exc())
+    # volcello
+    try:
+        print("Loading volcello data")
+        volcello_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'lev':-1}
+            ),
+            variable_id = "volcello",
+            member_id = member,
+            table_id = "Ofx",
+        )
+        print("\nvolcello_datadask: ", volcello_datadask)
+        volcello_file = f'{outputdir}/volcello.nc'
+        print("Saving volcello to: ", volcello_file)
+        volcello_datadask.to_netcdf(volcello_file, compute=True)
+    except Exception:
+        print(f'Error processing {model} {member} volcello')
+        print(traceback.format_exc())
 
 
-        # umo
-        try:
-            print("Loading umo data")
-            umo_datadask = select_latest_data(searched_cat,
-                dict(
-                    chunks={'time': -1, 'lev':-1}
-                ),
-                variable_id = "umo",
-                member_id = member,
-                frequency = "mon",
-            )
-            print("\numo_datadask: ", umo_datadask)
-            print("Slicing umo for the time period")
-            umo_datadask_sel = umo_datadask.sel(time=slice(start_time, end_time))
-            print("Averaging umo")
-            umo = umo_datadask_sel["umo"].weighted(umo_datadask_sel.time.dt.days_in_month).mean(dim="time")
-            print("\numo: ", umo)
-            print("Saving umo to: ", f'{outputdir}/umo.nc')
-            umo.to_netcdf(f'{outputdir}/umo.nc', compute=True)
-        except Exception:
-            print(f'Error processing {model} {member} umo')
-            print(traceback.format_exc())
+    # areacello
+    try:
+        print("Loading areacello data")
+        areacello_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'lev':-1}
+            ),
+            variable_id = "areacello",
+            member_id = member,
+            table_id = "Ofx",
+        )
+        print("\nareacello_datadask: ", areacello_datadask)
+        areacello_file = f'{outputdir}/areacello.nc'
+        print("Saving areacello to: ", areacello_file)
+        areacello_datadask.to_netcdf(areacello_file, compute=True)
+    except Exception:
+        print(f'Error processing {model} {member} areacello')
+        print(traceback.format_exc())
 
-        # vmo
-        try:
-            print("Loading vmo data")
-            vmo_datadask = select_latest_data(searched_cat,
-                dict(
-                    chunks={'time': -1, 'lev':-1}
-                ),
-                variable_id = "vmo",
-                member_id = member,
-                frequency = "mon",
-            )
-            print("\nvmo_datadask: ", vmo_datadask)
-            print("Slicing vmo for the time period")
-            vmo_datadask_sel = vmo_datadask.sel(time=slice(start_time, end_time))
-            print("Averaging vmo")
-            vmo = vmo_datadask_sel["vmo"].weighted(vmo_datadask_sel.time.dt.days_in_month).mean(dim="time")
-            print("\nvmo: ", vmo)
-            print("Saving vmo to: ", f'{outputdir}/vmo.nc')
-            vmo.to_netcdf(f'{outputdir}/vmo.nc', compute=True)
-        except Exception:
-            print(f'Error processing {model} {member} vmo')
-            print(traceback.format_exc())
 
-        # uo
-        try:
-            print("Loading uo data")
-            uo_datadask = select_latest_data(searched_cat,
-                dict(
-                    chunks={'time': -1, 'lev':-1}
-                ),
-                variable_id = "uo",
-                member_id = member,
-                frequency = "mon",
-            )
-            print("\nuo_datadask: ", uo_datadask)
-            print("Slicing uo for the time period")
-            uo_datadask_sel = uo_datadask.sel(time=slice(start_time, end_time))
-            print("Averaging uo")
-            uo = uo_datadask_sel["uo"].weighted(uo_datadask_sel.time.dt.days_in_month).mean(dim="time")
-            print("\nuo: ", uo)
-            print("Saving uo to: ", f'{outputdir}/uo.nc')
-            uo.to_netcdf(f'{outputdir}/uo.nc', compute=True)
-        except Exception:
-            print(f'Error processing {model} {member} uo')
-            print(traceback.format_exc())
+    # umo
+    try:
+        print("Loading umo data")
+        umo_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'lev':-1}
+            ),
+            variable_id = "umo",
+            member_id = member,
+            frequency = "mon",
+        )
+        print("\numo_datadask: ", umo_datadask)
+        print("Slicing umo for the time period")
+        umo_datadask_sel = umo_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging umo")
+        umo = umo_datadask_sel["umo"].weighted(umo_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        print("\numo: ", umo)
+        print("Saving umo to: ", f'{outputdir}/umo.nc')
+        umo.to_netcdf(f'{outputdir}/umo.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} {member} umo')
+        print(traceback.format_exc())
 
-        # vo
-        try:
-            print("Loading vo data")
-            vo_datadask = select_latest_data(searched_cat,
-                dict(
-                    chunks={'time': -1, 'lev':-1}
-                ),
-                variable_id = "vo",
-                member_id = member,
-                frequency = "mon",
-            )
-            print("\nvo_datadask: ", vo_datadask)
-            print("Slicing vo for the time period")
-            vo_datadask_sel = vo_datadask.sel(time=slice(start_time, end_time))
-            print("Averaging vo")
-            vo = vo_datadask_sel["vo"].weighted(vo_datadask_sel.time.dt.days_in_month).mean(dim="time")
-            print("\nvo: ", vo)
-            print("Saving vo to: ", f'{outputdir}/vo.nc')
-            vo.to_netcdf(f'{outputdir}/vo.nc', compute=True)
-        except Exception:
-            print(f'Error processing {model} {member} vo')
-            print(traceback.format_exc())
+    # vmo
+    try:
+        print("Loading vmo data")
+        vmo_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'lev':-1}
+            ),
+            variable_id = "vmo",
+            member_id = member,
+            frequency = "mon",
+        )
+        print("\nvmo_datadask: ", vmo_datadask)
+        print("Slicing vmo for the time period")
+        vmo_datadask_sel = vmo_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging vmo")
+        vmo = vmo_datadask_sel["vmo"].weighted(vmo_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        print("\nvmo: ", vmo)
+        print("Saving vmo to: ", f'{outputdir}/vmo.nc')
+        vmo.to_netcdf(f'{outputdir}/vmo.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} {member} vmo')
+        print(traceback.format_exc())
 
-        # mlotst dataset
-        try:
-            print("Loading mlotst data")
-            mlotst_datadask = select_latest_data(searched_cat,
-                dict(
-                    chunks={'time': -1, 'lev':-1}
-                ),
-                variable_id = "mlotst",
-                member_id = member,
-                frequency = "mon",
-            )
-            print("\nmlotst_datadask: ", mlotst_datadask)
-            print("Slicing mlotst for the time period")
-            mlotst_datadask_sel = mlotst_datadask.sel(time=slice(start_time, end_time))
-            print("Averaging mlotst (mean of the yearly maximum of monthly data)")
-            mlotst_yearlymax = mlotst_datadask_sel.groupby("time.year").max(dim="time")
-            print("\nmlotst_yearlymax: ", mlotst_yearlymax)
-            mlotst = mlotst_yearlymax.mean(dim="year")
-            print("\nmlotst: ", mlotst)
-            print("Saving mlotst to: ", f'{outputdir}/mlotst.nc')
-            mlotst.to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
-            mlotst_max = mlotst_datadask_sel.max(dim="time")
-            print("\nmlotst_max: ", mlotst_max)
-            print("Saving mlotst_max to: ", f'{outputdir}/mlotst_max.nc')
-            mlotst_max.to_netcdf(f'{outputdir}/mlotst_max.nc', compute=True)
-        except Exception:
-            print(f'Error processing {model} {member} mlotst')
-            print(traceback.format_exc())
+    # uo
+    try:
+        print("Loading uo data")
+        uo_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'lev':-1}
+            ),
+            variable_id = "uo",
+            member_id = member,
+            frequency = "mon",
+        )
+        print("\nuo_datadask: ", uo_datadask)
+        print("Slicing uo for the time period")
+        uo_datadask_sel = uo_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging uo")
+        uo = uo_datadask_sel["uo"].weighted(uo_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        print("\nuo: ", uo)
+        print("Saving uo to: ", f'{outputdir}/uo.nc')
+        uo.to_netcdf(f'{outputdir}/uo.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} {member} uo')
+        print(traceback.format_exc())
 
-        # thetao dataset
-        try:
-            print("Loading thetao data")
-            thetao_datadask = select_latest_data(searched_cat,
-                dict(
-                    chunks={'time': -1, 'lev':-1}
-                ),
-                variable_id = "thetao",
-                member_id = member,
-                frequency = "mon",
-            )
-            print("\nthetao_datadask: ", thetao_datadask)
-            print("Slicing thetao for the time period")
-            thetao_datadask_sel = thetao_datadask.sel(time=slice(start_time, end_time))
-            print("Averaging thetao")
-            thetao = thetao_datadask_sel["thetao"].weighted(thetao_datadask_sel.time.dt.days_in_month).mean(dim="time")
-            print("\nthetao: ", thetao)
-            print("Saving thetao to: ", f'{outputdir}/thetao.nc')
-            thetao.to_netcdf(f'{outputdir}/thetao.nc', compute=True)
-        except Exception:
-            print(f'Error processing {model} {member} thetao')
-            print(traceback.format_exc())
+    # vo
+    try:
+        print("Loading vo data")
+        vo_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'lev':-1}
+            ),
+            variable_id = "vo",
+            member_id = member,
+            frequency = "mon",
+        )
+        print("\nvo_datadask: ", vo_datadask)
+        print("Slicing vo for the time period")
+        vo_datadask_sel = vo_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging vo")
+        vo = vo_datadask_sel["vo"].weighted(vo_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        print("\nvo: ", vo)
+        print("Saving vo to: ", f'{outputdir}/vo.nc')
+        vo.to_netcdf(f'{outputdir}/vo.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} {member} vo')
+        print(traceback.format_exc())
 
-        # so dataset
-        try:
-            print("Loading so data")
-            so_datadask = select_latest_data(searched_cat,
-                dict(
-                    chunks={'time': -1, 'lev':-1}
-                ),
-                variable_id = "so",
-                member_id = member,
-                frequency = "mon",
-            )
-            print("\nso_datadask: ", so_datadask)
-            print("Slicing so for the time period")
-            so_datadask_sel = so_datadask.sel(time=slice(start_time, end_time))
-            print("Averaging so")
-            so = so_datadask_sel["so"].weighted(so_datadask_sel.time.dt.days_in_month).mean(dim="time")
-            print("\nso: ", so)
-            print("Saving so to: ", f'{outputdir}/so.nc')
-            so.to_netcdf(f'{outputdir}/so.nc', compute=True)
-        except Exception:
-            print(f'Error processing {model} {member} so')
-            print(traceback.format_exc())
+    # mlotst dataset
+    try:
+        print("Loading mlotst data")
+        mlotst_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'lev':-1}
+            ),
+            variable_id = "mlotst",
+            member_id = member,
+            frequency = "mon",
+        )
+        print("\nmlotst_datadask: ", mlotst_datadask)
+        print("Slicing mlotst for the time period")
+        mlotst_datadask_sel = mlotst_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging mlotst (mean of the yearly maximum of monthly data)")
+        mlotst_yearlymax = mlotst_datadask_sel.groupby("time.year").max(dim="time")
+        print("\nmlotst_yearlymax: ", mlotst_yearlymax)
+        mlotst = mlotst_yearlymax.mean(dim="year")
+        print("\nmlotst: ", mlotst)
+        print("Saving mlotst to: ", f'{outputdir}/mlotst.nc')
+        mlotst.to_netcdf(f'{outputdir}/mlotst.nc', compute=True)
+        mlotst_max = mlotst_datadask_sel.max(dim="time")
+        print("\nmlotst_max: ", mlotst_max)
+        print("Saving mlotst_max to: ", f'{outputdir}/mlotst_max.nc')
+        mlotst_max.to_netcdf(f'{outputdir}/mlotst_max.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} {member} mlotst')
+        print(traceback.format_exc())
 
-        # agessc dataset
-        try:
-            print("Loading agessc data")
-            agessc_datadask = select_latest_data(searched_cat,
-                dict(
-                    chunks={'time': -1, 'lev':-1}
-                ),
-                variable_id = "agessc",
-                member_id = member,
-                frequency = "mon",
-            )
-            print("\nagessc_datadask: ", agessc_datadask)
-            print("Slicing agessc for the time period")
-            agessc_datadask_sel = agessc_datadask.sel(time=slice(start_time, end_time))
-            print("Averaging agessc")
-            agessc = agessc_datadask_sel["agessc"].weighted(agessc_datadask_sel.time.dt.days_in_month).mean(dim="time")
-            print("\nagessc: ", agessc)
-            print("Saving agessc to: ", f'{outputdir}/agessc.nc')
-            agessc.to_netcdf(f'{outputdir}/agessc.nc', compute=True)
-        except Exception:
-            print(f'Error processing {model} {member} agessc')
-            print(traceback.format_exc())
+    # thetao dataset
+    try:
+        print("Loading thetao data")
+        thetao_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'lev':-1}
+            ),
+            variable_id = "thetao",
+            member_id = member,
+            frequency = "mon",
+        )
+        print("\nthetao_datadask: ", thetao_datadask)
+        print("Slicing thetao for the time period")
+        thetao_datadask_sel = thetao_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging thetao")
+        thetao = thetao_datadask_sel["thetao"].weighted(thetao_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        print("\nthetao: ", thetao)
+        print("Saving thetao to: ", f'{outputdir}/thetao.nc')
+        thetao.to_netcdf(f'{outputdir}/thetao.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} {member} thetao')
+        print(traceback.format_exc())
+
+    # so dataset
+    try:
+        print("Loading so data")
+        so_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'lev':-1}
+            ),
+            variable_id = "so",
+            member_id = member,
+            frequency = "mon",
+        )
+        print("\nso_datadask: ", so_datadask)
+        print("Slicing so for the time period")
+        so_datadask_sel = so_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging so")
+        so = so_datadask_sel["so"].weighted(so_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        print("\nso: ", so)
+        print("Saving so to: ", f'{outputdir}/so.nc')
+        so.to_netcdf(f'{outputdir}/so.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} {member} so')
+        print(traceback.format_exc())
+
+    # agessc dataset
+    try:
+        print("Loading agessc data")
+        agessc_datadask = select_latest_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'lev':-1}
+            ),
+            variable_id = "agessc",
+            member_id = member,
+            frequency = "mon",
+        )
+        print("\nagessc_datadask: ", agessc_datadask)
+        print("Slicing agessc for the time period")
+        agessc_datadask_sel = agessc_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging agessc")
+        agessc = agessc_datadask_sel["agessc"].weighted(agessc_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        print("\nagessc: ", agessc)
+        print("Saving agessc to: ", f'{outputdir}/agessc.nc')
+        agessc.to_netcdf(f'{outputdir}/agessc.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} {member} agessc')
+        print(traceback.format_exc())
 
 
 

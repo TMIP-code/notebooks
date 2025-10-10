@@ -128,10 +128,7 @@ if __name__ == '__main__':
             frequency = "fx",
         )
         print("\narea_t_datadask: ", area_t_datadask)
-        print("Slicing area_t for the time period")
-        area_t_datadask_sel = area_t_datadask.sel(time=slice(start_time, end_time))
-        print("Averaging area_t")
-        area_t = area_t_datadask_sel["area_t"].weighted(area_t_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        area_t = area_t_datadask["area_t"]
         print("\narea_t: ", area_t)
         print("Saving area_t to: ", f'{outputdir}/area_t.nc')
         area_t.to_netcdf(f'{outputdir}/area_t.nc', compute=True)
@@ -148,13 +145,13 @@ if __name__ == '__main__':
                 chunks={'time': -1, 'xt_ocean':400, 'yt_ocean':300, 'lev':7}
             ),
             variable = "tx_trans",
-            frequency = "yr",
+            frequency = "1mon",
         )
         print("\ntx_trans_datadask: ", tx_trans_datadask)
         print("Slicing tx_trans for the time period")
         tx_trans_datadask_sel = tx_trans_datadask.sel(time=slice(start_time, end_time))
         print("Averaging tx_trans")
-        tx_trans = tx_trans_datadask_sel["tx_trans"].weighted(tx_trans_datadask_sel.time.dt.days_in_year).mean(dim="time")
+        tx_trans = tx_trans_datadask_sel["tx_trans"].weighted(tx_trans_datadask_sel.time.dt.days_in_month).mean(dim="time")
         print("\ntx_trans: ", tx_trans)
         print("Saving tx_trans to: ", f'{outputdir}/tx_trans.nc')
         tx_trans.to_netcdf(f'{outputdir}/tx_trans.nc', compute=True)
@@ -170,13 +167,13 @@ if __name__ == '__main__':
                 chunks={'time': -1, 'xt_ocean':400, 'yt_ocean':300, 'lev':7}
             ),
             variable = "ty_trans",
-            frequency = "yr",
+            frequency = "1mon",
         )
         print("\nty_trans_datadask: ", ty_trans_datadask)
         print("Slicing ty_trans for the time period")
         ty_trans_datadask_sel = ty_trans_datadask.sel(time=slice(start_time, end_time))
         print("Averaging ty_trans")
-        ty_trans = ty_trans_datadask_sel["ty_trans"].weighted(ty_trans_datadask_sel.time.dt.days_in_year).mean(dim="time")
+        ty_trans = ty_trans_datadask_sel["ty_trans"].weighted(ty_trans_datadask_sel.time.dt.days_in_month).mean(dim="time")
         print("\nty_trans: ", ty_trans)
         print("Saving ty_trans to: ", f'{outputdir}/ty_trans.nc')
         ty_trans.to_netcdf(f'{outputdir}/ty_trans.nc', compute=True)
@@ -193,7 +190,7 @@ if __name__ == '__main__':
                 chunks={'time': -1, 'xt_ocean':900, 'yt_ocean':675}
             ),
             variable = "mld",
-            frequency = "mon",
+            frequency = "1mon",
         )
         print("\nmld_datadask: ", mld_datadask)
         print("Slicing mld for the time period")
@@ -221,12 +218,16 @@ if __name__ == '__main__':
                 chunks={'time': -1, 'xt_ocean':400, 'yt_ocean':300, 'lev':7}
             ),
             variable = "dzt",
-            frequency = "mon",
+            frequency = "1mon",
         )
         print("\ndzt_datadask: ", dzt_datadask)
-        dzt_file = f'{outputdir}/dzt.nc'
-        print("Saving dzt to: ", dzt_file)
-        dzt_datadask.to_netcdf(dzt_file, compute=True)
+        print("Slicing dzt for the time period")
+        dzt_datadask_sel = dzt_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging dzt")
+        dzt = dzt_datadask_sel["dzt"].weighted(dzt_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        print("\ndzt: ", dzt)
+        print("Saving dzt to: ", f'{outputdir}/dzt.nc')
+        dzt.to_netcdf(f'{outputdir}/dzt.nc', compute=True)
     except Exception:
         print(f'Error processing {model} dzt')
         print(traceback.format_exc())

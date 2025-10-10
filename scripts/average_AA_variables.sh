@@ -15,10 +15,10 @@
 echo "Going into TMIP notebooks directory"
 cd ~/Projects/TMIP/notebooks
 
-echo "Loading conda/analysis3-24.04 module"
+echo "Loading conda/analysis3 module"
 module use /g/data/xp65/public/modules
-module load conda/analysis3-24.04
-conda activate conda/analysis3-24.04
+module load conda/analysis3
+conda activate conda/analysis3
 conda info
 
 echo "Loading python3/3.12.1"
