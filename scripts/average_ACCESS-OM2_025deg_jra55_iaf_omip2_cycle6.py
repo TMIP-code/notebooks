@@ -108,7 +108,7 @@ if __name__ == '__main__':
         print("Loading area_t data")
         area_t_datadask = select_data(searched_cat,
             dict(
-                chunks={'xt_ocean':360, 'yt_ocean':300}
+                chunks={'xt_ocean':240, 'yt_ocean':216}
             ),
             variable = "area_t",
             frequency = "fx",
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         print("Loading tx_trans data")
         tx_trans_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':180, 'yt_ocean':150, 'lev':25}
+                chunks={'time': -1, 'xt_ocean':120, 'yt_ocean':108, 'lev':25}
             ),
             variable = "tx_trans",
             frequency = "1mon",
@@ -150,7 +150,7 @@ if __name__ == '__main__':
         print("Loading ty_trans data")
         ty_trans_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':180, 'yt_ocean':150, 'lev':25}
+                chunks={'time': -1, 'xt_ocean':120, 'yt_ocean':108, 'lev':25}
             ),
             variable = "ty_trans",
             frequency = "1mon",
@@ -167,13 +167,56 @@ if __name__ == '__main__':
         print(f'Error processing {model} ty_trans')
         print(traceback.format_exc())
 
+    # tx_trans_gm
+    try:
+        print("Loading tx_trans_gm data")
+        tx_trans_gm_datadask = select_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'xt_ocean':120, 'yt_ocean':108, 'lev':25}
+            ),
+            variable = "tx_trans_gm",
+            frequency = "1mon",
+        )
+        print("\ntx_trans_gm_datadask: ", tx_trans_gm_datadask)
+        print("Slicing tx_trans_gm for the time period")
+        tx_trans_gm_datadask_sel = tx_trans_gm_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging tx_trans_gm")
+        tx_trans_gm = tx_trans_gm_datadask_sel["tx_trans_gm"].weighted(tx_trans_gm_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        print("\ntx_trans_gm: ", tx_trans_gm)
+        print("Saving tx_trans_gm to: ", f'{outputdir}/tx_trans_gm.nc')
+        tx_trans_gm.to_netcdf(f'{outputdir}/tx_trans_gm.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} tx_trans_gm')
+        print(traceback.format_exc())
+
+    # ty_trans_gm
+    try:
+        print("Loading ty_trans_gm data")
+        ty_trans_gm_datadask = select_data(searched_cat,
+            dict(
+                chunks={'time': -1, 'xt_ocean':120, 'yt_ocean':108, 'lev':25}
+            ),
+            variable = "ty_trans_gm",
+            frequency = "1mon",
+        )
+        print("\nty_trans_gm_datadask: ", ty_trans_gm_datadask)
+        print("Slicing ty_trans_gm for the time period")
+        ty_trans_gm_datadask_sel = ty_trans_gm_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging ty_trans_gm")
+        ty_trans_gm = ty_trans_gm_datadask_sel["ty_trans_gm"].weighted(ty_trans_gm_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        print("\nty_trans_gm: ", ty_trans_gm)
+        print("Saving ty_trans_gm to: ", f'{outputdir}/ty_trans_gm.nc')
+        ty_trans_gm.to_netcdf(f'{outputdir}/ty_trans_gm.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} ty_trans_gm')
+        print(traceback.format_exc())
 
     # mld dataset
     try:
         print("Loading mld data")
         mld_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':360, 'yt_ocean':300}
+                chunks={'time': -1, 'xt_ocean':240, 'yt_ocean':216}
             ),
             variable = "mld",
             frequency = "1mon",
@@ -201,7 +244,7 @@ if __name__ == '__main__':
         print("Loading dht data")
         dht_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':180, 'yt_ocean':150, 'lev':25}
+                chunks={'time': -1, 'xt_ocean':120, 'yt_ocean':108, 'lev':25}
             ),
             variable = "dht",
             frequency = "1mon",

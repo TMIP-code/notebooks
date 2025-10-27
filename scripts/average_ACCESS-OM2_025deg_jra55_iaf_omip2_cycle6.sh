@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #PBS -P y99
-#PBS -N OM2_raw_preprocessing
+#PBS -N OM2-025_prepro
 #PBS -l ncpus=48
 #PBS -l mem=190GB
 #PBS -l jobfs=4GB
