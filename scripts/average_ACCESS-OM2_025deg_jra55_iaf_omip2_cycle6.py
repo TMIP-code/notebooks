@@ -3,8 +3,8 @@
 import sys
 
 # interactive use only
-model = "ACCESS-OM2-1"
-subcatalog = "1deg_jra55_iaf_omip2_cycle6"
+model = "ACCESS-OM2-025"
+subcatalog = "025deg_jra55_iaf_omip2_cycle6"
 year_start = 1960
 num_years = 20
 
@@ -165,50 +165,6 @@ if __name__ == '__main__':
         ty_trans.to_netcdf(f'{outputdir}/ty_trans.nc', compute=True)
     except Exception:
         print(f'Error processing {model} ty_trans')
-        print(traceback.format_exc())
-
-    # tx_trans_gm
-    try:
-        print("Loading tx_trans_gm data")
-        tx_trans_gm_datadask = select_data(searched_cat,
-            dict(
-                chunks={'time': -1, 'xt_ocean':180, 'yt_ocean':150, 'lev':25}
-            ),
-            variable = "tx_trans_gm",
-            frequency = "1mon",
-        )
-        print("\ntx_trans_gm_datadask: ", tx_trans_gm_datadask)
-        print("Slicing tx_trans_gm for the time period")
-        tx_trans_gm_datadask_sel = tx_trans_gm_datadask.sel(time=slice(start_time, end_time))
-        print("Averaging tx_trans_gm")
-        tx_trans_gm = tx_trans_gm_datadask_sel["tx_trans_gm"].weighted(tx_trans_gm_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        print("\ntx_trans_gm: ", tx_trans_gm)
-        print("Saving tx_trans_gm to: ", f'{outputdir}/tx_trans_gm.nc')
-        tx_trans_gm.to_netcdf(f'{outputdir}/tx_trans_gm.nc', compute=True)
-    except Exception:
-        print(f'Error processing {model} tx_trans_gm')
-        print(traceback.format_exc())
-
-    # ty_trans_gm
-    try:
-        print("Loading ty_trans_gm data")
-        ty_trans_gm_datadask = select_data(searched_cat,
-            dict(
-                chunks={'time': -1, 'xt_ocean':180, 'yt_ocean':150, 'lev':25}
-            ),
-            variable = "ty_trans_gm",
-            frequency = "1mon",
-        )
-        print("\nty_trans_gm_datadask: ", ty_trans_gm_datadask)
-        print("Slicing ty_trans_gm for the time period")
-        ty_trans_gm_datadask_sel = ty_trans_gm_datadask.sel(time=slice(start_time, end_time))
-        print("Averaging ty_trans_gm")
-        ty_trans_gm = ty_trans_gm_datadask_sel["ty_trans_gm"].weighted(ty_trans_gm_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        print("\nty_trans_gm: ", ty_trans_gm)
-        print("Saving ty_trans_gm to: ", f'{outputdir}/ty_trans_gm.nc')
-        ty_trans_gm.to_netcdf(f'{outputdir}/ty_trans_gm.nc', compute=True)
-    except Exception:
-        print(f'Error processing {model} ty_trans_gm')
         print(traceback.format_exc())
 
 

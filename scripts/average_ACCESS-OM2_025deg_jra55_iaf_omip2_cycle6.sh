@@ -24,7 +24,7 @@ echo "Loading python3/3.12.1"
 module load python3/3.12.1
 
 echo "Running transport-state script"
-python scripts/average_ACCESS-OM2_1deg_jra55_iaf_omip2_cycle6.py \
-&> output/average_ACCESS-OM2_1deg_jra55_iaf_omip2_cycle6.$PBS_JOBID.out
+python scripts/average_ACCESS-OM2_025deg_jra55_iaf_omip2_cycle6.py \
+&> output/average_ACCESS-OM2_025deg_jra55_iaf_omip2_cycle6.$PBS_JOBID.out
 
 
