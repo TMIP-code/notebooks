@@ -77,7 +77,7 @@ cat = catalogs[subcatalog]
 print(cat)
 
 # Only keep the required data
-searched_cat = cat.search(variable = ["tx_trans", "ty_trans", "mld", "area_t", "dht"])
+searched_cat = cat.search(variable = ["tx_trans", "ty_trans", "tx_trans_gm", "ty_trans_gm", "mld", "area_t", "dht"])
 print(searched_cat)
 
 
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         print("Loading tx_trans data")
         tx_trans_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':180, 'yt_ocean':150, 'lev':25}
+                chunks={'time': -1, 'xu_ocean':180, 'yt_ocean':150, 'lev':25}
             ),
             variable = "tx_trans",
             frequency = "1mon",
@@ -150,7 +150,7 @@ if __name__ == '__main__':
         print("Loading ty_trans data")
         ty_trans_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':180, 'yt_ocean':150, 'lev':25}
+                chunks={'time': -1, 'xt_ocean':180, 'yu_ocean':150, 'lev':25}
             ),
             variable = "ty_trans",
             frequency = "1mon",
@@ -172,7 +172,7 @@ if __name__ == '__main__':
         print("Loading tx_trans_gm data")
         tx_trans_gm_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':180, 'yt_ocean':150, 'lev':25}
+                chunks={'time': -1, 'xu_ocean':180, 'yt_ocean':150, 'lev':25}
             ),
             variable = "tx_trans_gm",
             frequency = "1mon",
@@ -194,7 +194,7 @@ if __name__ == '__main__':
         print("Loading ty_trans_gm data")
         ty_trans_gm_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':180, 'yt_ocean':150, 'lev':25}
+                chunks={'time': -1, 'xt_ocean':180, 'yu_ocean':150, 'lev':25}
             ),
             variable = "ty_trans_gm",
             frequency = "1mon",
@@ -210,7 +210,6 @@ if __name__ == '__main__':
     except Exception:
         print(f'Error processing {model} ty_trans_gm')
         print(traceback.format_exc())
-
 
     # mld dataset
     try:

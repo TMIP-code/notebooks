@@ -34,7 +34,7 @@ year_start=2150 # for this experiment this is the start of the last decade
 num_years=10
 
 echo "Running transport-state script"
-python scripts/average_ACCESS-OM2_raw_output_variables.py $model $subcatalog $year_start $num_years \
+python3 scripts/average_ACCESS-OM2_raw_output_variables.py $model $subcatalog $year_start $num_years \
 &> output/$model.$subcatalog.raw_output.$year_start.$num_years.$PBS_JOBID.out
 
 

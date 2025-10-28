@@ -38,7 +38,7 @@ lumpby=month
 
 
 echo "Running transport-state script"
-python scripts/diagnose_cyclo_reemergence.py $model $experiment $year_start $num_years $lumpby \
+python3 scripts/diagnose_cyclo_reemergence.py $model $experiment $year_start $num_years $lumpby \
 &> output/cyclo.diagnose_cyclo_reemergence.$PBS_JOBID.$model.$experiment.$year_start.$num_years.out
 
 

@@ -23,6 +23,6 @@ echo "Loading python3/3.12.1"
 module load python3/3.12.1
 
 echo "Running catalog filtering script"
-python scripts/ACCESS-OM2_runs_for_TMs.py &> output/ACCESS-OM2_runs_for_TMs.$PBS_JOBID.out
+python3 scripts/ACCESS-OM2_runs_for_TMs.py &> output/ACCESS-OM2_runs_for_TMs.$PBS_JOBID.out
 
 

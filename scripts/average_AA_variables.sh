@@ -26,6 +26,6 @@ module load python3/3.12.1
 
 
 echo "Running transport-state script"
-python scripts/average_AA_variables.py &> output/AA_preprocessing.$PBS_JOBID.out
+python3 scripts/average_AA_variables.py &> output/AA_preprocessing.$PBS_JOBID.out
 
 

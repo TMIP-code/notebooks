@@ -38,7 +38,7 @@ year_start=1990
 num_years=10
 
 echo "Running transport-state script"
-python scripts/average_CMIP6_ACCESS_variables.py $model $experiment $ensemble $year_start $num_years \
+python3 scripts/average_CMIP6_ACCESS_variables.py $model $experiment $ensemble $year_start $num_years \
 &> output/$model.$experiment.allensembles.$year_start.$num_years.$PBS_JOBID.out
 
 

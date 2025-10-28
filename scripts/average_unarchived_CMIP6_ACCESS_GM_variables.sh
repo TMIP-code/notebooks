@@ -31,7 +31,7 @@ year_start=1850
 num_years=10
 
 echo "Running transport-state script"
-python scripts/average_unarchived_CMIP6_ACCESS_GM_variables.py $model $experiment $year_start $num_years \
+python3 scripts/average_unarchived_CMIP6_ACCESS_GM_variables.py $model $experiment $year_start $num_years \
 &> output/$PBS_JOBID.average.$model.$experiment.datafromTilo.$year_start.$num_years.out
 
 

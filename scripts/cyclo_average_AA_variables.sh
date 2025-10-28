@@ -26,5 +26,5 @@ module load python3/3.12.1
 
 
 echo "Running transport-state script"
-python scripts/cyclo_average_AA_variables.py &> output/cyclo_average_AA_variables.$PBS_JOBID.out
+python3 scripts/cyclo_average_AA_variables.py &> output/cyclo_average_AA_variables.$PBS_JOBID.out
 

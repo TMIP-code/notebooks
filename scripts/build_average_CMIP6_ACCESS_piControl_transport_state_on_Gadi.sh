@@ -31,7 +31,7 @@ ensemble=r1i1p1f1 # <- note that this is not used in the script
 num_years=30
 
 echo "Running transport-state script"
-python scripts/build_average_CMIP6_ACCESS_piControl_transport_state_on_Gadi.py $model $experiment $ensemble $num_years \
+python3 scripts/build_average_CMIP6_ACCESS_piControl_transport_state_on_Gadi.py $model $experiment $ensemble $num_years \
 &> output/$model.$experiment.allensembles.last$num_years.$PBS_JOBID.out
 
 

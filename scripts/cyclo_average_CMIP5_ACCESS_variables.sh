@@ -34,7 +34,7 @@ num_years=10
 lumpby=season
 
 echo "Running transport-state script"
-python scripts/cyclo_average_CMIP5_ACCESS_variables.py $model $experiment $ensemble $year_start $num_years $lumpby \
+python3 scripts/cyclo_average_CMIP5_ACCESS_variables.py $model $experiment $ensemble $year_start $num_years $lumpby \
 &> output/cyclo.$lumpby.$experiment.$model.allensembles.$year_start.$num_years.$PBS_JOBID.out
 
 

@@ -34,7 +34,7 @@ module load python3/3.12.1
 # num_years=10
 
 echo "Running transport-state script"
-python scripts/average_ACCESS-OM2_01deg_jra55v13_ryf9091_qian.py \
+python3 scripts/average_ACCESS-OM2_01deg_jra55v13_ryf9091_qian.py \
 &> output/average_ACCESS-OM2_01deg_jra55v13_ryf9091_qian.$PBS_JOBID.out
 
 

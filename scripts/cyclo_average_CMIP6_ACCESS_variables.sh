@@ -39,7 +39,7 @@ lumpby=month
 ensemble=r1i1p1f1 # <- note that this is not used in the script
 
 echo "Running transport-state script"
-python scripts/cyclo_average_CMIP6_ACCESS_variables.py $model $experiment $ensemble $year_start $num_years $lumpby \
+python3 scripts/cyclo_average_CMIP6_ACCESS_variables.py $model $experiment $ensemble $year_start $num_years $lumpby \
 &> output/cyclo_average_CMIP6_ACCESS_variables.$model.$experiment.$year_start.$num_years.$PBS_JOBID.out
 
 
