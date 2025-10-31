@@ -34,6 +34,9 @@ import traceback
 # Load pandas for data manipulation
 import pandas as pd
 
+# Import numpy
+import numpy as np
+
 # 2. Define some functions
 # (to avoid too much boilerplate code)
 print("Defining functions")
@@ -53,7 +56,15 @@ def select_data(cat, xarray_open_kwargs, **kwargs):
     )
     return datadask
 
-
+def yearlymeans(ds):
+    # Make a DataArray with the number of days in each month, size = len(time)
+    month_length = ds.time.dt.days_in_month
+    # Calculate the weights by grouping by 'time.year'
+    weights = month_length.groupby("time.year") / month_length.groupby("time.year").sum()
+    # Test that the sum of the weights for each year is 1.0
+    np.testing.assert_allclose(weights.groupby("time.year").sum().values, 1.0)
+    # Calculate the weighted average
+    return (ds * weights).groupby("time.year").sum(dim="time")
 
 # 3. Load catalog
 
@@ -133,7 +144,7 @@ if __name__ == '__main__':
 
     try:
         print("Calculating total overturning streamfunction")
-        psi_tot = psi.ty_trans_rho + psi_gm.ty_trans_rho_gm
+        psi_tot = (psi.ty_trans_rho + psi_gm.ty_trans_rho_gm).to_dataset(name='psi_tot')
         print("\npsi_tot: ", psi_tot)
         psi_tot.to_netcdf(f'{outputdir}/psi_tot.nc', compute=True)
     except Exception:
@@ -141,12 +152,64 @@ if __name__ == '__main__':
         print(traceback.format_exc())
 
     try:
+        print("Yearly means")
+        psi_tot_year = yearlymeans(psi_tot)
+        print("\npsi_tot_year: ", psi_tot_year)
+        psi_tot_year.to_netcdf(f'{outputdir}/psi_tot_year.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} psi_tot_year')
+        print(traceback.format_exc())
+
+    try:
         print("Averaging total overturning streamfunction")
-        psi_tot_avg = psi_tot.mean("time")
+        psi_tot_avg = psi_tot.weighted(psi_tot.time.dt.days_in_month).mean(dim="time")
         print("\npsi_tot_avg: ", psi_tot_avg)
         psi_tot_avg.to_netcdf(f'{outputdir}/psi_tot_avg.nc', compute=True)
     except Exception:
         print(f'Error processing {model} psi_tot_avg')
+        print(traceback.format_exc())
+
+    try:
+        print("Loading psi_tot into memory for rolling averages")
+        psi_tot = psi_tot.load()
+    except Exception:
+        print(f'Error loading {model} psi_tot into memory')
+        print(traceback.format_exc())
+
+    try:
+        print("Calculating rolling yearly average of total overturning streamfunction")
+        window_size = 12  # 12 months for yearly rolling average
+        psi_tot_rolling = psi_tot.rolling(time=window_size).construct("window")
+        print("\npsi_tot_rolling: ", psi_tot_rolling)
+        month_weights = psi_tot.time.dt.days_in_month
+        print("\nmonth_weights: ", month_weights)
+        month_weights_rolling = month_weights.rolling(time=window_size).construct("window")
+        print("\nmonth_weights_rolling: ", month_weights_rolling)
+        psi_tot_rolling_weighted = psi_tot_rolling.weighted(month_weights_rolling.fillna(0))
+        print("\npsi_tot_rolling_weighted: ", psi_tot_rolling_weighted)
+        psi_tot_rollingyear = psi_tot_rolling_weighted.mean("window", skipna=False)
+        print("\npsi_tot_rollingyear: ", psi_tot_rollingyear)
+        psi_tot_rollingyear.to_netcdf(f'{outputdir}/psi_tot_rollingyear.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} psi_tot_rollingyear')
+        print(traceback.format_exc())
+
+    try:
+        print("Calculating rolling decadal average of total overturning streamfunction")
+        window_size = 120  # 120 months for 10-year rolling average
+        psi_tot_rolling = psi_tot.rolling(time=window_size).construct("window")
+        print("\npsi_tot_rolling: ", psi_tot_rolling)
+        month_weights = psi_tot.time.dt.days_in_month
+        print("\nmonth_weights: ", month_weights)
+        month_weights_rolling = month_weights.rolling(time=window_size).construct("window")
+        print("\nmonth_weights_rolling: ", month_weights_rolling)
+        psi_tot_rolling_weighted = psi_tot_rolling.weighted(month_weights_rolling.fillna(0))
+        print("\npsi_tot_rolling_weighted: ", psi_tot_rolling_weighted)
+        psi_tot_rollingdecade = psi_tot_rolling_weighted.mean("window", skipna=False)
+        print("\npsi_tot_rollingdecade: ", psi_tot_rollingdecade)
+        psi_tot_rollingdecade.to_netcdf(f'{outputdir}/psi_tot_rollingdecade.nc', compute=True)
+    except Exception:
+        print(f'Error processing {model} psi_tot_rollingdecade')
         print(traceback.format_exc())
 
 

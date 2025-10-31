@@ -16,11 +16,6 @@
 echo "Loading conda/analysis3 module"
 module use /g/data/xp65/public/modules
 module load conda/analysis3-25.07
-conda activate conda/analysis3-25.07
-conda info
-
-echo "Loading python3/3.12.1"
-module load python3/3.12.1
 
 echo "Running catalog filtering script"
 python3 scripts/ACCESS-OM2_runs_for_TMs.py &> output/ACCESS-OM2_runs_for_TMs.$PBS_JOBID.out
