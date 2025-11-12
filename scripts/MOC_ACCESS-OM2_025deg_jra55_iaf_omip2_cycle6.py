@@ -115,7 +115,7 @@ if __name__ == '__main__':
         print("\nty_trans_rho_datadask: ", ty_trans_rho_datadask)
         print("Sum longitudinally and cumsum vertically")
         psi = ty_trans_rho_datadask.sum("grid_xt_ocean")
-        psi = psi.cumsum('potrho') - psi.sum('potrho')
+        psi = psi.cumulative('potrho').sum() - psi.sum('potrho')
         print("\npsi: ", psi)
         print("Saving psi to: ", f'{outputdir}/psi.nc')
         psi.to_netcdf(f'{outputdir}/psi.nc', compute=True)

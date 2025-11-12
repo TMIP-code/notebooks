@@ -126,9 +126,9 @@ if __name__ == '__main__':
 
     try:
         print("Calculating overturning streamfunction")
-        psi = y_trans_rho_lonsum.cumsum('potrho', keep_attrs=True) - y_trans_rho_lonsum.sum('potrho')
+        psi = y_trans_rho_lonsum.cumulative('potrho').sum() - y_trans_rho_lonsum.sum('potrho')
+        print("\npsi: ", psi)
         psi_tot = psi.ty_trans_rho.to_dataset(name='psi_tot')
-        psi_tot.assign_coords(y_trans_rho_lonsum.coords) # to keep coords as the operations above destroy them?
         print("\npsi_tot: ", psi_tot)
         psi_tot.to_netcdf(f'{outputdir}/psi_tot.nc', compute=True)
     except Exception:
