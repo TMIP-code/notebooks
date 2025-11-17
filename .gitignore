@@ -166,3 +166,4 @@ cython_debug/
 output/
 
 todo
+tmp.sh*
