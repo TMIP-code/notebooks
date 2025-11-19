@@ -156,7 +156,7 @@ if __name__ == '__main__':
         tx_trans = month_climatology(tx_trans_datadask_sel["tx_trans"])
         print("\ntx_trans: ", tx_trans)
         print("Saving tx_trans to: ", f'{outputdir}/tx_trans_periodic.nc')
-        tx_trans.to_netcdf(f'{outputdir}/tx_trans_periodic.nc', compute=True)
+        tx_trans.to_dataset(name="tx_trans").to_netcdf(f'{outputdir}/tx_trans_periodic.nc', compute=True)
     except Exception:
         print(f'Error processing {model} tx_trans')
         print(traceback.format_exc())
@@ -178,7 +178,7 @@ if __name__ == '__main__':
         ty_trans = month_climatology(ty_trans_datadask_sel["ty_trans"])
         print("\nty_trans: ", ty_trans)
         print("Saving ty_trans to: ", f'{outputdir}/ty_trans_periodic.nc')
-        ty_trans.to_netcdf(f'{outputdir}/ty_trans_periodic.nc', compute=True)
+        ty_trans.to_dataset(name="ty_trans").to_netcdf(f'{outputdir}/ty_trans_periodic.nc', compute=True)
     except Exception:
         print(f'Error processing {model} ty_trans')
         print(traceback.format_exc())
@@ -200,7 +200,7 @@ if __name__ == '__main__':
         tx_trans_gm = month_climatology(tx_trans_gm_datadask_sel["tx_trans_gm"])
         print("\ntx_trans_gm: ", tx_trans_gm)
         print("Saving tx_trans_gm to: ", f'{outputdir}/tx_trans_gm_periodic.nc')
-        tx_trans_gm.to_netcdf(f'{outputdir}/tx_trans_gm_periodic.nc', compute=True)
+        tx_trans_gm.to_dataset(name="tx_trans_gm").to_netcdf(f'{outputdir}/tx_trans_gm_periodic.nc', compute=True)
     except Exception:
         print(f'Error processing {model} tx_trans_gm')
         print(traceback.format_exc())
@@ -222,7 +222,7 @@ if __name__ == '__main__':
         ty_trans_gm = month_climatology(ty_trans_gm_datadask_sel["ty_trans_gm"])
         print("\nty_trans_gm: ", ty_trans_gm)
         print("Saving ty_trans_gm to: ", f'{outputdir}/ty_trans_gm_periodic.nc')
-        ty_trans_gm.to_netcdf(f'{outputdir}/ty_trans_gm_periodic.nc', compute=True)
+        ty_trans_gm.to_dataset(name="ty_trans_gm").to_netcdf(f'{outputdir}/ty_trans_gm_periodic.nc', compute=True)
     except Exception:
         print(f'Error processing {model} ty_trans_gm')
         print(traceback.format_exc())
@@ -244,7 +244,7 @@ if __name__ == '__main__':
         mld = month_climatology(mld_datadask_sel["mld"])
         print("\nmld: ", mld)
         print("Saving mld to: ", f'{outputdir}/mld_periodic.nc')
-        mld.to_netcdf(f'{outputdir}/mld_periodic.nc', compute=True)
+        mld.to_dataset(name="mld").to_netcdf(f'{outputdir}/mld_periodic.nc', compute=True)
     except Exception:
         print(f'Error processing {model} mld')
         print(traceback.format_exc())
@@ -266,7 +266,7 @@ if __name__ == '__main__':
         dht = month_climatology(dht_datadask_sel["dht"])
         print("\ndht: ", dht)
         print("Saving dht to: ", f'{outputdir}/dht_periodic.nc')
-        dht.to_netcdf(f'{outputdir}/dht_periodic.nc', compute=True)
+        dht.to_dataset(name="dht").to_netcdf(f'{outputdir}/dht_periodic.nc', compute=True)
     except Exception:
         print(f'Error processing {model} dht')
         print(traceback.format_exc())
