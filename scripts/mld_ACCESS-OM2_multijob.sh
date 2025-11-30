@@ -1,11 +1,11 @@
-# for OM2run in 1deg_jra55_iaf_omip2_cycle{3..3}; do
-#     # change placeholders in script, submit, and clean up
-#     sed "s/OM2run_placeholder/$OM2run/g" scripts/mld_ACCESS-OM2-1.sh > tmp.sh
-#     qsub tmp.sh
-#     rm tmp.sh
-# done
+for OM2run in 1deg_jra55_iaf_omip2_cycle{1..6}; do
+    # change placeholders in script, submit, and clean up
+    sed "s/OM2run_placeholder/$OM2run/g" scripts/mld_ACCESS-OM2-1.sh > tmp.sh
+    qsub tmp.sh
+    rm tmp.sh
+done
 
-# for OM2run in 025deg_jra55_iaf_omip2_cycle{1..5}; do
+# for OM2run in 025deg_jra55_iaf_omip2_cycle{1..6}; do
 #     # change placeholders in script, submit, and clean up
 #     sed "s/OM2run_placeholder/$OM2run/g" scripts/mld_ACCESS-OM2-025.sh > tmp.sh
 #     qsub tmp.sh
@@ -29,6 +29,6 @@
 #     rm tmp.sh
 # done
 
-sed "s/OM2run_placeholder/025deg_jra55_iaf_omip2_cycle6/g" scripts/mld_ACCESS-OM2-025.sh > tmp.sh
-qsub tmp.sh
-rm tmp.sh
+# sed "s/OM2run_placeholder/025deg_jra55_iaf_omip2_cycle6/g" scripts/mld_ACCESS-OM2-025.sh > tmp.sh
+# qsub tmp.sh
+# rm tmp.sh

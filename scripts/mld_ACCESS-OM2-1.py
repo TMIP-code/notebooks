@@ -2,7 +2,7 @@
 import sys
 
 # interactive use only
-model = "ACCESS-OM2-025"
+model = "ACCESS-OM2-1"
 subcatalog = sys.argv[1]
 
 # 1. Load packages
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         print("Loading mld data")
         mld_datadask = select_data(
             searched_cat,
-            dict(chunks={"time": -1, "yt_ocean": 216, "xt_ocean": 240}),
+            dict(chunks={"time": -1, "yt_ocean": 300, "xt_ocean": 360}),
             variable="mld",
             frequency="1mon",
         )
@@ -113,7 +113,7 @@ if __name__ == "__main__":
         print("Saving mld to: ", f"{outputdir}/mld.nc")
         mld_datadask.mld.to_netcdf(
             f"{outputdir}/mld.nc",
-            encoding={"mld": {"chunksizes": [len(mld_datadask.mld.time), 216, 240]}},
+            encoding={"mld": {"chunksizes": [len(mld_datadask.mld.time), 300, 360]}},
         )
     except Exception:
         print(f"Error processing {model} mld")
