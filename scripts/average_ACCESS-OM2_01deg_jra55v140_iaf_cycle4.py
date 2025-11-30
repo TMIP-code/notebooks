@@ -4,8 +4,8 @@ import sys
 print(sys.prefix)
 
 # interactive use only
-model = "ACCESS-OM2-025"
-subcatalog = "025deg_jra55_iaf_omip2_cycle6"
+model = "ACCESS-OM2-01"
+subcatalog = "01deg_jra55v140_iaf_cycle4"
 year_start = 1960
 num_years = 20
 
@@ -78,7 +78,7 @@ cat = catalogs[subcatalog]
 print(cat)
 
 # Only keep the required data
-searched_cat = cat.search(variable = ["tx_trans", "ty_trans", "tx_trans_gm", "ty_trans_gm", "mld", "area_t", "dht"])
+searched_cat = cat.search(variable = ["tx_trans", "ty_trans", "tx_trans_gm", "ty_trans_gm", "mld", "area_t", "dzt"])
 print(searched_cat)
 
 
@@ -109,7 +109,7 @@ if __name__ == '__main__':
         print("Loading area_t data")
         area_t_datadask = select_data(searched_cat,
             dict(
-                chunks={'xt_ocean':240, 'yt_ocean':216}
+                chunks={'xt_ocean':720, 'yt_ocean':540}
             ),
             variable = "area_t",
             frequency = "fx",
@@ -129,7 +129,7 @@ if __name__ == '__main__':
         print("Loading tx_trans data")
         tx_trans_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xu_ocean':120, 'yt_ocean':108, 'lev':25}
+                chunks={'time': -1, 'xu_ocean':180, 'yt_ocean':135, 'st_ocean':19}
             ),
             variable = "tx_trans",
             frequency = "1mon",
@@ -151,7 +151,7 @@ if __name__ == '__main__':
         print("Loading ty_trans data")
         ty_trans_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':120, 'yu_ocean':108, 'lev':25}
+                chunks={'time': -1, 'xt_ocean':180, 'yu_ocean':135, 'st_ocean':19}
             ),
             variable = "ty_trans",
             frequency = "1mon",
@@ -168,56 +168,14 @@ if __name__ == '__main__':
         print(f'Error processing {model} ty_trans')
         print(traceback.format_exc())
 
-    # tx_trans_gm
-    try:
-        print("Loading tx_trans_gm data")
-        tx_trans_gm_datadask = select_data(searched_cat,
-            dict(
-                chunks={'time': -1, 'xu_ocean':120, 'yt_ocean':108, 'lev':25}
-            ),
-            variable = "tx_trans_gm",
-            frequency = "1mon",
-        )
-        print("\ntx_trans_gm_datadask: ", tx_trans_gm_datadask)
-        print("Slicing tx_trans_gm for the time period")
-        tx_trans_gm_datadask_sel = tx_trans_gm_datadask.sel(time=slice(start_time, end_time))
-        print("Averaging tx_trans_gm")
-        tx_trans_gm = tx_trans_gm_datadask_sel["tx_trans_gm"].weighted(tx_trans_gm_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        print("\ntx_trans_gm: ", tx_trans_gm)
-        print("Saving tx_trans_gm to: ", f'{outputdir}/tx_trans_gm.nc')
-        tx_trans_gm.to_dataset(name="tx_trans_gm").to_netcdf(f'{outputdir}/tx_trans_gm.nc', compute=True)
-    except Exception:
-        print(f'Error processing {model} tx_trans_gm')
-        print(traceback.format_exc())
 
-    # ty_trans_gm
-    try:
-        print("Loading ty_trans_gm data")
-        ty_trans_gm_datadask = select_data(searched_cat,
-            dict(
-                chunks={'time': -1, 'xt_ocean':120, 'yu_ocean':108, 'lev':25}
-            ),
-            variable = "ty_trans_gm",
-            frequency = "1mon",
-        )
-        print("\nty_trans_gm_datadask: ", ty_trans_gm_datadask)
-        print("Slicing ty_trans_gm for the time period")
-        ty_trans_gm_datadask_sel = ty_trans_gm_datadask.sel(time=slice(start_time, end_time))
-        print("Averaging ty_trans_gm")
-        ty_trans_gm = ty_trans_gm_datadask_sel["ty_trans_gm"].weighted(ty_trans_gm_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        print("\nty_trans_gm: ", ty_trans_gm)
-        print("Saving ty_trans_gm to: ", f'{outputdir}/ty_trans_gm.nc')
-        ty_trans_gm.to_dataset(name="ty_trans_gm").to_netcdf(f'{outputdir}/ty_trans_gm.nc', compute=True)
-    except Exception:
-        print(f'Error processing {model} ty_trans_gm')
-        print(traceback.format_exc())
 
     # mld dataset
     try:
         print("Loading mld data")
         mld_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':240, 'yt_ocean':216}
+                chunks={'time': -1, 'xt_ocean':720, 'yt_ocean':540}
             ),
             variable = "mld",
             frequency = "1mon",
@@ -240,26 +198,26 @@ if __name__ == '__main__':
         print(f'Error processing {model} mld')
         print(traceback.format_exc())
 
-    # dht
+    # dzt
     try:
-        print("Loading dht data")
-        dht_datadask = select_data(searched_cat,
+        print("Loading dzt data")
+        dzt_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':120, 'yt_ocean':108, 'lev':25}
+                chunks={'time': -1, 'xt_ocean':180, 'yt_ocean':135, 'st_ocean':19}
             ),
-            variable = "dht",
+            variable = "dzt",
             frequency = "1mon",
         )
-        print("\ndht_datadask: ", dht_datadask)
-        print("Slicing dht for the time period")
-        dht_datadask_sel = dht_datadask.sel(time=slice(start_time, end_time))
-        print("Averaging dht")
-        dht = dht_datadask_sel["dht"].weighted(dht_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        print("\ndht: ", dht)
-        print("Saving dht to: ", f'{outputdir}/dht.nc')
-        dht.to_dataset(name="dht").to_netcdf(f'{outputdir}/dht.nc', compute=True)
+        print("\ndzt_datadask: ", dzt_datadask)
+        print("Slicing dzt for the time period")
+        dzt_datadask_sel = dzt_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging dzt")
+        dzt = dzt_datadask_sel["dzt"].weighted(dzt_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        print("\ndzt: ", dzt)
+        print("Saving dzt to: ", f'{outputdir}/dzt.nc')
+        dzt.to_dataset(name="dzt").to_netcdf(f'{outputdir}/dzt.nc', compute=True)
     except Exception:
-        print(f'Error processing {model} dht')
+        print(f'Error processing {model} dzt')
         print(traceback.format_exc())
 
 
