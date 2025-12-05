@@ -184,7 +184,7 @@ if __name__ == '__main__':
         print("Slicing mld for the time period")
         mld_datadask_sel = mld_datadask.sel(time=slice(start_time, end_time))
         print("Averaging mld (mean of the yearly maximum of monthly data)")
-        mld_yearlymax = mld_datadask_sel.groupby("time.year").max(dim="time")
+        mld_yearlymax = mld_datadask_sel["mld"].groupby("time.year").max(dim="time")
         print("\nmld_yearlymax: ", mld_yearlymax)
         mld = mld_yearlymax.mean(dim="year")
         print("\nmld: ", mld)
