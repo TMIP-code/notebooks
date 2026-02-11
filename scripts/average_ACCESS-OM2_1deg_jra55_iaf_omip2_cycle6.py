@@ -77,7 +77,7 @@ cat = catalogs[subcatalog]
 print(cat)
 
 # Only keep the required data
-searched_cat = cat.search(variable = ["u", "v", "tx_trans", "ty_trans", "tx_trans_gm", "ty_trans_gm", "mld", "area_t", "dht"])
+searched_cat = cat.search(variable = ["u", "v", "tx_trans", "ty_trans", "tx_trans_gm", "ty_trans_gm", "mld", "area_t", "dht", "eta_t"])
 print(searched_cat)
 
 
@@ -262,48 +262,70 @@ if __name__ == '__main__':
     #     print(traceback.format_exc())
 
 
-    # u
-    try:
-        print("Loading u data")
-        u_datadask = select_data(searched_cat,
-            dict(
-                chunks={'time': -1, 'xu_ocean':180, 'yt_ocean':150, 'lev':25}
-            ),
-            variable = "u",
-            frequency = "1mon",
-        )
-        print("\nu_datadask: ", u_datadask)
-        print("Slicing u for the time period")
-        u_datadask_sel = u_datadask.sel(time=slice(start_time, end_time))
-        print("Averaging u")
-        u = u_datadask_sel["u"].weighted(u_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        print("\nu: ", u)
-        print("Saving u to: ", f'{outputdir}/u.nc')
-        u.to_netcdf(f'{outputdir}/u.nc', compute=True)
-    except Exception:
-        print(f'Error processing {model} u')
-        print(traceback.format_exc())
+    # # u
+    # try:
+    #     print("Loading u data")
+    #     u_datadask = select_data(searched_cat,
+    #         dict(
+    #             chunks={'time': -1, 'xu_ocean':180, 'yt_ocean':150, 'lev':25}
+    #         ),
+    #         variable = "u",
+    #         frequency = "1mon",
+    #     )
+    #     print("\nu_datadask: ", u_datadask)
+    #     print("Slicing u for the time period")
+    #     u_datadask_sel = u_datadask.sel(time=slice(start_time, end_time))
+    #     print("Averaging u")
+    #     u = u_datadask_sel["u"].weighted(u_datadask_sel.time.dt.days_in_month).mean(dim="time")
+    #     print("\nu: ", u)
+    #     print("Saving u to: ", f'{outputdir}/u.nc')
+    #     u.to_netcdf(f'{outputdir}/u.nc', compute=True)
+    # except Exception:
+    #     print(f'Error processing {model} u')
+    #     print(traceback.format_exc())
 
-    # v
+    # # v
+    # try:
+    #     print("Loading v data")
+    #     v_datadask = select_data(searched_cat,
+    #         dict(
+    #             chunks={'time': -1, 'xt_ocean':180, 'yu_ocean':150, 'lev':25}
+    #         ),
+    #         variable = "v",
+    #         frequency = "1mon",
+    #     )
+    #     print("\nv_datadask: ", v_datadask)
+    #     print("Slicing v for the time period")
+    #     v_datadask_sel = v_datadask.sel(time=slice(start_time, end_time))
+    #     print("Averaging v")
+    #     v = v_datadask_sel["v"].weighted(v_datadask_sel.time.dt.days_in_month).mean(dim="time")
+    #     print("\nv: ", v)
+    #     print("Saving v to: ", f'{outputdir}/v.nc')
+    #     v.to_netcdf(f'{outputdir}/v.nc', compute=True)
+    # except Exception:
+    #     print(f'Error processing {model} v')
+    #     print(traceback.format_exc())
+
+    # eta_t
     try:
-        print("Loading v data")
-        v_datadask = select_data(searched_cat,
+        print("Loading eta_t data")
+        eta_t_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':180, 'yu_ocean':150, 'lev':25}
+                chunks={'time': -1, 'xt_ocean':360, 'yt_ocean':300}
             ),
-            variable = "v",
+            variable = "eta_t",
             frequency = "1mon",
         )
-        print("\nv_datadask: ", v_datadask)
-        print("Slicing v for the time period")
-        v_datadask_sel = v_datadask.sel(time=slice(start_time, end_time))
-        print("Averaging v")
-        v = v_datadask_sel["v"].weighted(v_datadask_sel.time.dt.days_in_month).mean(dim="time")
-        print("\nv: ", v)
-        print("Saving v to: ", f'{outputdir}/v.nc')
-        v.to_netcdf(f'{outputdir}/v.nc', compute=True)
+        print("\neta_t_datadask: ", eta_t_datadask)
+        print("Slicing eta_t for the time period")
+        eta_t_datadask_sel = eta_t_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging eta_t")
+        eta_t = eta_t_datadask_sel["eta_t"].weighted(eta_t_datadask_sel.time.dt.days_in_month).mean(dim="time")
+        print("\neta_t: ", eta_t)
+        print("Saving eta_t to: ", f'{outputdir}/eta_t.nc')
+        eta_t.to_netcdf(f'{outputdir}/eta_t.nc', compute=True)
     except Exception:
-        print(f'Error processing {model} v')
+        print(f'Error processing {model} eta_t')
         print(traceback.format_exc())
 
     client.close()

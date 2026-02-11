@@ -271,50 +271,71 @@ if __name__ == '__main__':
     #     print(f'Error processing {model} dht')
     #     print(traceback.format_exc())
 
-    # u
+    # # u
+    # try:
+    #     print("Loading u data")
+    #     u_datadask = select_data(searched_cat,
+    #         dict(
+    #             chunks={'time': -1, 'xu_ocean':180, 'yt_ocean':150, 'lev':25}
+    #         ),
+    #         variable = "u",
+    #         frequency = "1mon",
+    #     )
+    #     print("\nu_datadask: ", u_datadask)
+    #     print("Slicing u for the time period")
+    #     u_datadask_sel = u_datadask.sel(time=slice(start_time, end_time))
+    #     print("Averaging u into monthly climatology")
+    #     u = month_climatology(u_datadask_sel["u"])
+    #     print("\nu: ", u)
+    #     print("Saving u to: ", f'{outputdir}/u_periodic.nc')
+    #     u.to_dataset(name="u").to_netcdf(f'{outputdir}/u_periodic.nc', compute=True)
+    # except Exception:
+    #     print(f'Error processing {model} u')
+    #     print(traceback.format_exc())
+
+    # # v
+    # try:
+    #     print("Loading v data")
+    #     v_datadask = select_data(searched_cat,
+    #         dict(
+    #             chunks={'time': -1, 'xt_ocean':180, 'yu_ocean':150, 'lev':25}
+    #         ),
+    #         variable = "v",
+    #         frequency = "1mon",
+    #     )
+    #     print("\nv_datadask: ", v_datadask)
+    #     print("Slicing v for the time period")
+    #     v_datadask_sel = v_datadask.sel(time=slice(start_time, end_time))
+    #     print("Averaging v into monthly climatology")
+    #     v = month_climatology(v_datadask_sel["v"])
+    #     print("\nv: ", v)
+    #     print("Saving v to: ", f'{outputdir}/v_periodic.nc')
+    #     v.to_dataset(name="v").to_netcdf(f'{outputdir}/v_periodic.nc', compute=True)
+    # except Exception:
+    #     print(f'Error processing {model} v')
+    #     print(traceback.format_exc())
+
+    # eta_t
     try:
-        print("Loading u data")
-        u_datadask = select_data(searched_cat,
+        print("Loading eta_t data")
+        eta_t_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xu_ocean':180, 'yt_ocean':150, 'lev':25}
+                chunks={'time': -1, 'xt_ocean':360, 'yt_ocean':300}
             ),
-            variable = "u",
+            variable = "eta_t",
             frequency = "1mon",
         )
-        print("\nu_datadask: ", u_datadask)
-        print("Slicing u for the time period")
-        u_datadask_sel = u_datadask.sel(time=slice(start_time, end_time))
-        print("Averaging u into monthly climatology")
-        u = month_climatology(u_datadask_sel["u"])
-        print("\nu: ", u)
-        print("Saving u to: ", f'{outputdir}/u_periodic.nc')
-        u.to_netcdf(f'{outputdir}/u_periodic.nc', compute=True)
+        print("\neta_t_datadask: ", eta_t_datadask)
+        print("Slicing eta_t for the time period")
+        eta_t_datadask_sel = eta_t_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging eta_t into monthly climatology")
+        eta_t = month_climatology(eta_t_datadask_sel["eta_t"])
+        print("\neta_t: ", eta_t)
+        print("Saving eta_t to: ", f'{outputdir}/eta_t_periodic.nc')
+        eta_t.to_dataset(name="eta_t").to_netcdf(f'{outputdir}/eta_t_periodic.nc', compute=True)
     except Exception:
-        print(f'Error processing {model} u')
+        print(f'Error processing {model} eta_t')
         print(traceback.format_exc())
-
-    # v
-    try:
-        print("Loading v data")
-        v_datadask = select_data(searched_cat,
-            dict(
-                chunks={'time': -1, 'xt_ocean':180, 'yu_ocean':150, 'lev':25}
-            ),
-            variable = "v",
-            frequency = "1mon",
-        )
-        print("\nv_datadask: ", v_datadask)
-        print("Slicing v for the time period")
-        v_datadask_sel = v_datadask.sel(time=slice(start_time, end_time))
-        print("Averaging v into monthly climatology")
-        v = month_climatology(v_datadask_sel["v"])
-        print("\nv: ", v)
-        print("Saving v to: ", f'{outputdir}/v_periodic.nc')
-        v.to_netcdf(f'{outputdir}/v_periodic.nc', compute=True)
-    except Exception:
-        print(f'Error processing {model} v')
-        print(traceback.format_exc())
-
 
 
 
