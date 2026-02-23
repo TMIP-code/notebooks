@@ -93,7 +93,7 @@ cat = catalogs[subcatalog]
 print(cat)
 
 # Only keep the required data
-searched_cat = cat.search(variable = ["tx_trans", "ty_trans", "tx_trans_gm", "ty_trans_gm", "mld", "area_t", "dht"])
+searched_cat = cat.search(variable = ["u", "v", "wt", "tx_trans", "ty_trans", "tx_trans_gm", "ty_trans_gm", "mld", "area_t", "dht"])
 print(searched_cat)
 
 
@@ -315,27 +315,49 @@ if __name__ == '__main__':
     #     print(f'Error processing {model} v')
     #     print(traceback.format_exc())
 
-    # eta_t
+    # wt
     try:
-        print("Loading eta_t data")
-        eta_t_datadask = select_data(searched_cat,
+        print("Loading wt data")
+        wt_datadask = select_data(searched_cat,
             dict(
-                chunks={'time': -1, 'xt_ocean':360, 'yt_ocean':300}
+                chunks={'time': -1, 'xt_ocean':180, 'yu_ocean':150, 'lev':25}
             ),
-            variable = "eta_t",
+            variable = "wt",
             frequency = "1mon",
         )
-        print("\neta_t_datadask: ", eta_t_datadask)
-        print("Slicing eta_t for the time period")
-        eta_t_datadask_sel = eta_t_datadask.sel(time=slice(start_time, end_time))
-        print("Averaging eta_t into monthly climatology")
-        eta_t = month_climatology(eta_t_datadask_sel["eta_t"])
-        print("\neta_t: ", eta_t)
-        print("Saving eta_t to: ", f'{outputdir}/eta_t_periodic.nc')
-        eta_t.to_dataset(name="eta_t").to_netcdf(f'{outputdir}/eta_t_periodic.nc', compute=True)
+        print("\nwt_datadask: ", wt_datadask)
+        print("Slicing wt for the time period")
+        wt_datadask_sel = wt_datadask.sel(time=slice(start_time, end_time))
+        print("Averaging wt into monthly climatology")
+        wt = month_climatology(wt_datadask_sel["wt"])
+        print("\nwt: ", wt)
+        print("Saving wt to: ", f'{outputdir}/wt_periodic.nc')
+        wt.to_dataset(name="wt").to_netcdf(f'{outputdir}/wt_periodic.nc', compute=True)
     except Exception:
-        print(f'Error processing {model} eta_t')
+        print(f'Error processing {model} wt')
         print(traceback.format_exc())
+
+    # # eta_t
+    # try:
+    #     print("Loading eta_t data")
+    #     eta_t_datadask = select_data(searched_cat,
+    #         dict(
+    #             chunks={'time': -1, 'xt_ocean':360, 'yt_ocean':300}
+    #         ),
+    #         variable = "eta_t",
+    #         frequency = "1mon",
+    #     )
+    #     print("\neta_t_datadask: ", eta_t_datadask)
+    #     print("Slicing eta_t for the time period")
+    #     eta_t_datadask_sel = eta_t_datadask.sel(time=slice(start_time, end_time))
+    #     print("Averaging eta_t into monthly climatology")
+    #     eta_t = month_climatology(eta_t_datadask_sel["eta_t"])
+    #     print("\neta_t: ", eta_t)
+    #     print("Saving eta_t to: ", f'{outputdir}/eta_t_periodic.nc')
+    #     eta_t.to_dataset(name="eta_t").to_netcdf(f'{outputdir}/eta_t_periodic.nc', compute=True)
+    # except Exception:
+    #     print(f'Error processing {model} eta_t')
+    #     print(traceback.format_exc())
 
 
 
